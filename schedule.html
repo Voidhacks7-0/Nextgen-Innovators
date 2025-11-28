@@ -2,602 +2,263 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Campus Connect - Schedule</title>
+    <title>SVVV | Schedule</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        :root {
+            --navy-dark: #0f2c4e; --navy-light: #1e3a8a; --accent-yellow: #fbbf24;
+            --bg-body: #f8fafc; --bg-surface: #ffffff; --text-main: #1e293b; --text-muted: #64748b;
+            --border: #e2e8f0; --sidebar-width: 260px;
         }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg-body); color: var(--text-main); display: flex; min-height: 100vh; }
+        
+        /* Sidebar */
+        .sidebar { width: var(--sidebar-width); background: var(--navy-dark); color: white; position: fixed; height: 100vh; display: flex; flex-direction: column; z-index: 100; }
+        .logo-area { padding: 2rem; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .logo-text { font-size: 2rem; font-weight: 800; letter-spacing: -1px; color: #fff; }
+        .logo-sub { font-size: 0.75rem; color: var(--accent-yellow); text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+        .nav-menu { padding: 2rem 1rem; flex: 1; list-style: none; }
+        .nav-link { display: flex; align-items: center; padding: 1rem; color: rgba(255,255,255,0.7); text-decoration: none; border-radius: 8px; margin-bottom: 0.5rem; font-weight: 500; transition: 0.2s; }
+        .nav-link:hover { color: #fff; background: rgba(255,255,255,0.05); }
+        .nav-link.active { background: var(--accent-yellow); color: var(--navy-dark); font-weight: 700; box-shadow: 0 4px 12px rgba(251, 191, 36, 0.3); }
+        .nav-link i { width: 24px; margin-right: 12px; font-size: 1.1rem; }
 
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            color: #333;
-        }
+        /* Main Content */
+        .main { margin-left: 260px; flex: 1; padding: 2.5rem; }
+        
+        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+        .controls { display: flex; gap: 1rem; }
+        select { padding: 12px 20px; border: 2px solid var(--border); border-radius: 8px; font-family: inherit; color: var(--navy-dark); font-weight: 600; background: #fff; cursor: pointer; outline: none; }
+        select:focus { border-color: var(--navy-dark); }
 
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 20px;
-        }
+        .schedule-grid { display: grid; grid-template-columns: 350px 1fr; gap: 2rem; }
+        
+        /* Timeline View */
+        .today-box { background: var(--navy-dark); color: white; border-radius: 12px; padding: 2rem; position: relative; overflow: hidden; box-shadow: 0 10px 30px rgba(15, 44, 78, 0.3); min-height: 400px; }
+        .today-box::before { content: ''; position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: rgba(255,255,255,0.05); border-radius: 50%; }
+        
+        .timeline { margin-top: 1.5rem; position: relative; padding-left: 20px; border-left: 2px solid rgba(255,255,255,0.2); }
+        .class-row { padding: 1.5rem; background: rgba(255,255,255,0.1); border-radius: 8px; margin-bottom: 1.5rem; position: relative; backdrop-filter: blur(5px); transition: 0.2s; cursor: pointer; border: 1px solid rgba(255,255,255,0.1); }
+        .class-row:hover { background: rgba(255,255,255,0.2); transform: translateX(5px); }
+        
+        /* Dots on timeline */
+        .class-row::before { content: ''; position: absolute; left: -26px; top: 20px; width: 10px; height: 10px; background: var(--accent-yellow); border-radius: 50%; box-shadow: 0 0 0 4px var(--navy-dark); }
+        .class-row.live { border-left: 4px solid #22c55e; background: rgba(34, 197, 94, 0.1); }
+        .live-badge { background: #22c55e; color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 700; margin-left: 10px; text-transform: uppercase; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
 
-        .header {
-            text-align: center;
-            color: white;
-            margin-bottom: 30px;
-        }
+        .class-time { font-size: 0.85rem; opacity: 0.8; margin-bottom: 6px; font-weight: 500; letter-spacing: 0.5px; }
+        .class-name { font-weight: 700; font-size: 1.2rem; margin-bottom: 6px; }
+        .class-loc { font-size: 0.9rem; display: flex; align-items: center; gap: 8px; color: var(--accent-yellow); }
 
-        .header h1 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 10px;
-        }
+        /* Table View */
+        .tt-wrapper { background: #fff; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
+        table { width: 100%; border-collapse: collapse; min-width: 800px; table-layout: fixed; }
+        th { text-align: center; padding: 1.2rem; background: #fff; color: var(--navy-dark); font-weight: 800; border-bottom: 2px solid var(--border); text-transform: uppercase; font-size: 0.85rem; letter-spacing: 1px; width: 16%; }
+        th:first-child { width: 10%; } /* Time column smaller */
+        
+        td { padding: 0.5rem; border-bottom: 1px solid var(--border); font-size: 0.95rem; vertical-align: top; height: 100px; border-right: 1px solid #f1f5f9; }
+        td:first-child { background: #f8fafc; font-weight: 700; color: var(--navy-dark); text-align: center; vertical-align: middle; border-right: 2px solid var(--border); }
+        
+        .tt-slot { padding: 10px 8px; border-radius: 6px; font-size: 0.85rem; font-weight: 600; margin-bottom: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); cursor: pointer; transition: 0.2s; text-align: center; height: 100%; display: flex; flex-direction: column; justify-content: center; }
+        .tt-slot:hover { transform: scale(1.05); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        
+        .slot-lec { background: #eff6ff; color: var(--navy-dark); border-left: 4px solid var(--navy-dark); }
+        .slot-lab { background: #fffbeb; color: #b45309; border-left: 4px solid var(--accent-yellow); }
+        .slot-tut { background: #f0fdf4; color: #166534; border-left: 4px solid #166534; }
 
-        .header p {
-            font-size: 1.1rem;
-            opacity: 0.9;
-        }
+        /* Modal */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(15, 44, 78, 0.6); backdrop-filter: blur(4px); z-index: 1000; display: none; align-items: center; justify-content: center; }
+        .modal-box { background: white; padding: 2.5rem; border-radius: 16px; width: 100%; max-width: 450px; box-shadow: 0 20px 50px rgba(0,0,0,0.3); animation: popIn 0.3s ease; }
+        @keyframes popIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        
+        .modal-details { margin: 1.5rem 0; padding: 1rem; background: #f8fafc; border-radius: 8px; border: 1px solid var(--border); }
+        .detail-row { display: flex; justify-content: space-between; margin-bottom: 8px; }
+        .detail-label { color: var(--text-muted); font-size: 0.9rem; }
+        .detail-val { font-weight: 700; color: var(--navy-dark); }
 
-        .filters {
-            background: white;
-            padding: 25px;
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            margin-bottom: 30px;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            align-items: center;
-            justify-content: center;
-        }
+        .btn-navy { background: var(--navy-dark); color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 700; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 8px; }
+        .btn-navy:hover { background: #1a3c61; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .btn-outline { border: 2px solid var(--navy-dark); background: transparent; color: var(--navy-dark); padding: 10px 20px; border-radius: 8px; font-weight: 700; cursor: pointer; }
+        
+        /* Toast */
+        .toast { position: fixed; bottom: 30px; right: 30px; background: var(--navy-dark); color: var(--accent-yellow); padding: 1rem 2rem; border-radius: 8px; font-weight: 600; transform: translateY(100px); transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 2000; display: flex; align-items: center; gap: 10px; box-shadow: 0 10px 20px rgba(0,0,0,0.15); }
+        .toast.show { transform: translateY(0); }
 
-        .filter-group {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-
-        .filter-group label {
-            font-weight: 600;
-            color: #555;
-            font-size: 0.95rem;
-        }
-
-        .filter-group select {
-            padding: 12px 20px;
-            border: 2px solid #e1e5e9;
-            border-radius: 12px;
-            background: white;
-            font-size: 0.95rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .filter-group select:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        .content-grid {
-            display: grid;
-            grid-template-columns: 1fr 2fr;
-            gap: 30px;
-            margin-bottom: 30px;
-        }
-
-        .card {
-            background: white;
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            backdrop-filter: blur(10px);
-        }
-
-        .section-title {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #2d3748;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        /* Today's Schedule */
-        .today-schedule {
-            grid-column: 1;
-        }
-
-        .schedule-item {
-            background: linear-gradient(135deg, #667eea15, #764ba215);
-            padding: 20px;
-            border-radius: 15px;
-            margin-bottom: 15px;
-            border-left: 4px solid #667eea;
-            transition: all 0.3s ease;
-        }
-
-        .schedule-item:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.15);
-        }
-
-        .schedule-time {
-            font-size: 0.9rem;
-            color: #667eea;
-            font-weight: 600;
-            margin-bottom: 5px;
-        }
-
-        .schedule-subject {
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: #2d3748;
-            margin-bottom: 5px;
-        }
-
-        .schedule-details {
-            display: flex;
-            gap: 15px;
-            font-size: 0.85rem;
-            color: #666;
-        }
-
-        .schedule-status {
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 600;
-        }
-
-        .status-upcoming {
-            background: #e3f2fd;
-            color: #1976d2;
-        }
-
-        .status-live {
-            background: #c8e6c9;
-            color: #2e7d32;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
-        }
-
-        /* Timetable */
-        .timetable {
-            grid-column: 1 / -1;
-        }
-
-        .timetable-header {
-            display: grid;
-            grid-template-columns: 100px repeat(6, 1fr);
-            gap: 2px;
-            margin-bottom: 2px;
-        }
-
-        .time-slot {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            padding: 15px 10px;
-            text-align: center;
-            font-weight: 600;
-            border-radius: 12px 12px 0 0;
-            font-size: 0.9rem;
-        }
-
-        .day-header {
-            background: linear-gradient(135deg, #f093fb, #f5576c);
-            color: white;
-            padding: 15px 10px;
-            text-align: center;
-            font-weight: 700;
-            font-size: 0.95rem;
-            border-radius: 0 0 12px 12px;
-        }
-
-        .timetable-grid {
-            display: grid;
-            grid-template-columns: 100px repeat(6, 1fr);
-            gap: 2px;
-            height: 600px;
-        }
-
-        .time-label {
-            background: #f8fafc;
-            padding: 20px 10px;
-            text-align: center;
-            font-weight: 600;
-            color: #64748b;
-            border-right: 2px solid #e2e8f0;
-            position: relative;
-        }
-
-        .timetable-cell {
-            background: #f8fafc;
-            border: 2px solid transparent;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .timetable-cell:hover {
-            background: #e3f2fd;
-            transform: scale(1.02);
-            border-color: #667eea;
-        }
-
-        .class-slot {
-            background: linear-gradient(135deg, #4facfe, #00f2fe);
-            color: white;
-            padding: 8px 12px;
-            border-radius: 8px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            margin: 4px;
-            position: absolute;
-            left: 4px;
-            right: 4px;
-            top: 50%;
-            transform: translateY(-50%);
-            box-shadow: 0 4px 12px rgba(79, 172, 254, 0.3);
-        }
-
-        .class-slot.lab {
-            background: linear-gradient(135deg, #43e97b, #38f9d7);
-        }
-
-        .class-slot.tutorial {
-            background: linear-gradient(135deg, #fa709a, #fee140);
-        }
-
-        /* Upcoming Classes */
-        .upcoming-classes {
-            grid-column: 1;
-        }
-
-        .upcoming-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px;
-            background: #f8fafc;
-            border-radius: 12px;
-            margin-bottom: 12px;
-            transition: all 0.3s ease;
-        }
-
-        .upcoming-item:hover {
-            background: #e3f2fd;
-        }
-
-        .upcoming-time {
-            font-weight: 700;
-            color: #667eea;
-            font-size: 1.1rem;
-        }
-
-        .upcoming-subject {
-            color: #2d3748;
-            font-weight: 600;
-        }
-
-        /* Responsive Design */
-        @media (max-width: 1024px) {
-            .content-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .timetable {
-                grid-column: 1;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                padding: 15px;
-            }
-            
-            .header h1 {
-                font-size: 2rem;
-            }
-            
-            .filters {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            
-            .filter-group {
-                width: 100%;
-                justify-content: center;
-            }
-            
-            .timetable-grid {
-                grid-template-columns: 80px repeat(6, 1fr);
-                height: 500px;
-            }
-            
-            .time-label {
-                font-size: 0.8rem;
-                padding: 15px 5px;
-            }
-            
-            .class-slot {
-                font-size: 0.7rem;
-                padding: 6px 8px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .header h1 {
-                font-size: 1.7rem;
-            }
-            
-            .timetable-grid {
-                display: block;
-                overflow-x: auto;
-            }
-            
-            .timetable-grid::-webkit-scrollbar {
-                height: 6px;
-            }
-        }
-
-        .empty-cell {
-            background: transparent;
-        }
-
-        .fab {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            font-size: 1.5rem;
-            cursor: pointer;
-            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
-            transition: all 0.3s ease;
-            z-index: 1000;
-        }
-
-        .fab:hover {
-            transform: scale(1.1);
-        }
+        @media (max-width: 768px) { .sidebar { display: none; } .main { margin-left: 0; padding: 1rem; } .schedule-grid { grid-template-columns: 1fr; } .tt-wrapper { overflow-x: auto; } }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1><i class="fas fa-calendar-alt"></i> My Schedule</h1>
-            <p>Stay organized with your class timetable and upcoming sessions</p>
-        </div>
+    <nav class="sidebar">
+        <div class="logo-area"><div class="logo-text">SVVV</div><div class="logo-sub">Student Portal</div></div>
+        <ul class="nav-menu">
+            <li><a href="dashboard.html" class="nav-link"><i class="fas fa-th-large"></i> Dashboard</a></li>
+            <li><a href="schedule.html" class="nav-link active"><i class="far fa-calendar-alt"></i> Schedule</a></li>
+            <li><a href="resources.html" class="nav-link"><i class="fas fa-layer-group"></i> Resources</a></li>
+            <li><a href="academics.html" class="nav-link"><i class="fas fa-graduation-cap"></i> Academics</a></li>
+            <li><a href="collaboration.html" class="nav-link"><i class="fas fa-users"></i> Collaboration</a></li>
+        </ul>
+    </nav>
 
-        <div class="filters">
-            <div class="filter-group">
-                <label><i class="fas fa-filter"></i> Semester:</label>
-                <select id="semesterFilter">
-                    <option>All Semesters</option>
-                    <option>1st Semester</option>
-                    <option>2nd Semester</option>
-                    <option>3rd Semester</option>
-                    <option>4th Semester</option>
+    <main class="main">
+        <div class="page-header">
+            <h1 style="font-size: 2rem; font-weight: 800; color: var(--navy-dark);">Class Schedule</h1>
+            <div class="controls">
+                <select id="semFilter" onchange="updateSchedule()">
+                    <option value="s5">Semester 5 (CS)</option>
+                    <option value="s3">Semester 3 (Mech)</option>
                 </select>
-            </div>
-            <div class="filter-group">
-                <label><i class="fas fa-building"></i> Branch:</label>
-                <select id="branchFilter">
-                    <option>All Branches</option>
-                    <option>Computer Science</option>
-                    <option>Electronics</option>
-                    <option>Mechanical</option>
-                    <option>Civil</option>
-                </select>
-            </div>
-            <div class="filter-group">
-                <label><i class="fas fa-chalkboard-teacher"></i> Faculty:</label>
-                <select id="facultyFilter">
-                    <option>All Faculty</option>
-                    <option>Dr. Smith</option>
-                    <option>Prof. Johnson</option>
-                    <option>Dr. Lee</option>
-                </select>
+                <button class="btn-navy" onclick="showToast('Downloading PDF...')"><i class="fas fa-download"></i> PDF</button>
             </div>
         </div>
 
-        <div class="content-grid">
-            <!-- Today's Schedule -->
-            <div class="card today-schedule">
-                <h2 class="section-title">
-                    <i class="fas fa-clock"></i> Today (Friday, Nov 28)
-                </h2>
-                <div class="schedule-item">
-                    <div class="schedule-time">10:00 AM - 11:30 AM</div>
-                    <div class="schedule-subject">Data Structures</div>
-                    <div class="schedule-details">
-                        <span>Room A-204</span>
-                        <span>Dr. Smith</span>
-                        <span class="schedule-status status-live">Live Now</span>
+        <div class="schedule-grid">
+            <div class="today-box">
+                <h2 style="margin-bottom: 0.5rem;">Today's Classes</h2>
+                <p style="opacity: 0.8; margin-bottom: 1.5rem;" id="currentDateStr">Friday, 28th Nov</p>
+                
+                <div class="timeline" id="timelineContainer">
                     </div>
-                </div>
-                <div class="schedule-item">
-                    <div class="schedule-time">2:00 PM - 3:30 PM</div>
-                    <div class="schedule-subject">Database Systems</div>
-                    <div class="schedule-details">
-                        <span>Lab B-101</span>
-                        <span>Prof. Johnson</span>
-                        <span class="schedule-status status-upcoming">Upcoming</span>
-                    </div>
-                </div>
             </div>
 
-            <!-- Upcoming Classes -->
-            <div class="card upcoming-classes">
-                <h2 class="section-title">
-                    <i class="fas fa-arrow-up"></i> Next 3 Classes
-                </h2>
-                <div class="upcoming-item">
-                    <div>
-                        <div class="upcoming-time">2:00 PM</div>
-                        <div class="upcoming-subject">Database Systems</div>
-                    </div>
-                    <div>Lab B-101</div>
-                </div>
-                <div class="upcoming-item">
-                    <div>
-                        <div class="upcoming-time">Sat 9:00 AM</div>
-                        <div class="upcoming-subject">Algorithms</div>
-                    </div>
-                    <div>Room A-305</div>
-                </div>
-                <div class="upcoming-item">
-                    <div>
-                        <div class="upcoming-time">Mon 10:00 AM</div>
-                        <div class="upcoming-subject">Web Development</div>
-                    </div>
-                    <div>Lab C-202</div>
-                </div>
+            <div class="tt-wrapper">
+                <table>
+                    <thead><tr><th>Time</th><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th></tr></thead>
+                    <tbody id="timetableBody">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <div class="modal-overlay" id="classModal">
+        <div class="modal-box">
+            <h2 style="color: var(--navy-dark); margin-bottom: 5px;" id="modalTitle">Class Name</h2>
+            <p style="color: var(--text-muted);" id="modalCode">CS-301</p>
+            
+            <div class="modal-details">
+                <div class="detail-row"><span class="detail-label">Time:</span> <span class="detail-val" id="modalTime">10:00 AM</span></div>
+                <div class="detail-row"><span class="detail-label">Faculty:</span> <span class="detail-val" id="modalProf">Dr. Smith</span></div>
+                <div class="detail-row"><span class="detail-label">Location:</span> <span class="detail-val" id="modalLoc">Room 302</span></div>
             </div>
 
-            <!-- Weekly Timetable -->
-            <div class="card timetable">
-                <h2 class="section-title">
-                    <i class="fas fa-table"></i> Weekly Timetable
-                </h2>
-                <div class="timetable-header">
-                    <div></div>
-                    <div class="day-header">Monday</div>
-                    <div class="day-header">Tuesday</div>
-                    <div class="day-header">Wednesday</div>
-                    <div class="day-header">Thursday</div>
-                    <div class="day-header">Friday</div>
-                    <div class="day-header">Saturday</div>
-                </div>
-                <div class="timetable-grid">
-                    <!-- Time Labels -->
-                    <div class="time-label">8:00-9:30</div>
-                    <div class="timetable-cell empty-cell"></div>
-                    <div class="timetable-cell">
-                        <div class="class-slot">Maths-I<br>Dr. Lee</div>
-                    </div>
-                    <div class="timetable-cell empty-cell"></div>
-                    <div class="timetable-cell">
-                        <div class="class-slot lab">Physics Lab</div>
-                    </div>
-                    <div class="timetable-cell empty-cell"></div>
-                    <div class="timetable-cell">
-                        <div class="class-slot tutorial">Maths Tutorial</div>
-                    </div>
-
-                    <div class="time-label">9:45-11:15</div>
-                    <div class="timetable-cell">
-                        <div class="class-slot">Programming<br>Prof. Smith</div>
-                    </div>
-                    <div class="timetable-cell empty-cell"></div>
-                    <div class="timetable-cell">
-                        <div class="class-slot">Maths-I<br>Dr. Lee</div>
-                    </div>
-                    <div class="timetable-cell empty-cell"></div>
-                    <div class="timetable-cell">
-                        <div class="class-slot">Data Structures</div>
-                    </div>
-                    <div class="timetable-cell empty-cell"></div>
-
-                    <div class="time-label">11:30-1:00</div>
-                    <div class="timetable-cell empty-cell"></div>
-                    <div class="timetable-cell">
-                        <div class="class-slot">Chemistry<br>Dr. Brown</div>
-                    </div>
-                    <div class="timetable-cell empty-cell"></div>
-                    <div class="timetable-cell">
-                        <div class="class-slot">Programming</div>
-                    </div>
-                    <div class="timetable-cell empty-cell"></div>
-                    <div class="timetable-cell">
-                        <div class="class-slot">Algorithms</div>
-                    </div>
-
-                    <div class="time-label">2:00-3:30</div>
-                    <div class="timetable-cell">
-                        <div class="class-slot">Data Structures</div>
-                    </div>
-                    <div class="timetable-cell empty-cell"></div>
-                    <div class="timetable-cell">
-                        <div class="class-slot tutorial">Programming Tutorial</div>
-                    </div>
-                    <div class="timetable-cell">
-                        <div class="class-slot">Data Structures</div>
-                    </div>
-                    <div class="timetable-cell">
-                        <div class="class-slot">Database Systems</div>
-                    </div>
-                    <div class="timetable-cell empty-cell"></div>
-
-                    <div class="time-label">3:45-5:15</div>
-                    <div class="timetable-cell empty-cell"></div>
-                    <div class="timetable-cell">
-                        <div class="class-slot lab">Chemistry Lab</div>
-                    </div>
-                    <div class="timetable-cell empty-cell"></div>
-                    <div class="timetable-cell">
-                        <div class="class-slot lab">Programming Lab</div>
-                    </div>
-                    <div class="timetable-cell empty-cell"></div>
-                    <div class="timetable-cell empty-cell"></div>
-                </div>
+            <div style="text-align: right; display: flex; justify-content: flex-end; gap: 10px;">
+                <button class="btn-outline" onclick="closeModal()">Close</button>
+                <button class="btn-navy" id="modalActionBtn">View Map</button>
             </div>
         </div>
     </div>
 
-    <button class="fab" onclick="addClass()">
-        <i class="fas fa-plus"></i>
-    </button>
+    <div class="toast" id="toast">
+        <i class="fas fa-info-circle"></i> <span>Action Successful!</span>
+    </div>
 
     <script>
-        // Filter functionality
-        document.querySelectorAll('select').forEach(select => {
-            select.addEventListener('change', function() {
-                // Add filter logic here
-                console.log('Filter applied:', this.id, this.value);
-            });
-        });
+        // --- Data ---
+        const schedules = {
+            s5: { // Computer Science
+                today: [
+                    { name: "Data Structures", time: "10:00 - 11:30", loc: "Room 302", prof: "Dr. Sharma", type: "lec", live: true },
+                    { name: "Database Lab", time: "02:00 - 03:30", loc: "Lab 1", prof: "Prof. Gupta", type: "lab", live: false }
+                ],
+                weekly: [
+                    ["10:00", "Maths-II", "", "Maths-II", "", "Data Struct"],
+                    ["12:00", "", "Physics Lab", "", "Logic", ""],
+                    ["02:00", "Web Dev", "", "Web Dev", "CS Lab", "DBMS"]
+                ]
+            },
+            s3: { // Mechanical
+                today: [
+                    { name: "Thermodynamics", time: "09:00 - 10:30", loc: "Hall B", prof: "Dr. Roy", type: "lec", live: false },
+                    { name: "Workshop Practice", time: "11:00 - 01:00", loc: "Workshop A", prof: "Mr. Singh", type: "lab", live: true }
+                ],
+                weekly: [
+                    ["09:00", "Thermo", "FM", "TOM", "Thermo", "FM"],
+                    ["11:00", "Maths-I", "Workshop", "CAD Lab", "Maths-I", "Workshop"],
+                    ["02:00", "Auto Eng", "", "Material Sci", "", "Auto Eng"]
+                ]
+            }
+        };
 
-        // Add class modal simulation
-        function addClass() {
-            alert('🗓️ Add New Class Modal would open here!\n\nFeatures to implement:\n• Add class details\n• Set recurring schedule\n• Assign faculty & room\n• Set notifications');
+        // --- Render Functions ---
+        function updateSchedule() {
+            const filter = document.getElementById('semFilter').value;
+            const data = schedules[filter];
+            const timeline = document.getElementById('timelineContainer');
+            const tbody = document.getElementById('timetableBody');
+
+            // 1. Render Timeline (Today)
+            timeline.innerHTML = data.today.map(cls => `
+                <div class="class-row ${cls.live ? 'live' : ''}" onclick="openClassModal('${cls.name}', '${cls.prof}', '${cls.loc}', '${cls.time}')">
+                    <div class="class-time">
+                        ${cls.time} 
+                        ${cls.live ? '<span class="live-badge">Live</span>' : ''}
+                    </div>
+                    <div class="class-name">${cls.name}</div>
+                    <div class="class-loc"><i class="fas fa-map-marker-alt"></i> ${cls.loc} • ${cls.prof}</div>
+                </div>
+            `).join('');
+
+            // 2. Render Table (Weekly)
+            tbody.innerHTML = data.weekly.map(row => {
+                // Determine slot style based on content roughly
+                return `
+                <tr>
+                    <td style="font-weight:700;">${row[0]}</td>
+                    ${row.slice(1).map(cell => {
+                        if(!cell) return '<td></td>';
+                        const typeClass = cell.includes("Lab") ? "slot-lab" : "slot-lec";
+                        return `<td>
+                            <div class="tt-slot ${typeClass}" onclick="openClassModal('${cell}', 'Check Details', 'TBA', 'Weekly Slot')">
+                                ${cell}
+                            </div>
+                        </td>`;
+                    }).join('')}
+                </tr>
+            `}).join('');
         }
 
-        // Add some interactive hover effects
-        document.querySelectorAll('.timetable-cell').forEach(cell => {
-            cell.addEventListener('click', function() {
-                if (!this.classList.contains('empty-cell')) {
-                    const slot = this.querySelector('.class-slot');
-                    if (slot) {
-                        alert(`📚 Class Details:\n${slot.textContent}\n\n• Click to view full details\n• Join video class\n• Download materials`);
-                    }
-                }
-            });
-        });
-
-        // Simulate live class indicator
-        setInterval(() => {
-            const status = document.querySelector('.status-live');
-            if (status) {
-                status.textContent = ['Live Now', 'In Progress', 'Join Class'][Math.floor(Math.random() * 3)];
+        // --- Modal Logic ---
+        function openClassModal(name, prof, loc, time) {
+            document.getElementById('modalTitle').innerText = name;
+            document.getElementById('modalProf').innerText = prof;
+            document.getElementById('modalLoc').innerText = loc;
+            document.getElementById('modalTime').innerText = time;
+            
+            const btn = document.getElementById('modalActionBtn');
+            if(loc.toLowerCase().includes('lab')) {
+                btn.innerHTML = '<i class="fas fa-file-alt"></i> Lab Manual';
+                btn.onclick = () => showToast("Opening Lab Manual...");
+            } else {
+                btn.innerHTML = '<i class="fas fa-map"></i> View Map';
+                btn.onclick = () => showToast("Navigating to Map...");
             }
-        }, 5000);
+
+            const modal = document.getElementById('classModal');
+            modal.style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('classModal').style.display = 'none';
+        }
+
+        // --- Toast Logic ---
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.querySelector('span').innerText = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 3000);
+        }
+
+        // --- Date Logic ---
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        document.getElementById('currentDateStr').innerText = new Date().toLocaleDateString('en-US', options);
+
+        // Initialize
+        updateSchedule();
+
     </script>
 </body>
 </html>

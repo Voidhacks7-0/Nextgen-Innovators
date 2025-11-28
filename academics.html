@@ -1,656 +1,146 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Campus Connect - Academics Dashboard</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-<style>
-  :root {
-    --color-primary: #5a67d8;
-    --color-primary-dark: #434190;
-    --color-secondary: #48bb78;
-    --color-bg: #f7fafc;
-    --color-card-bg: white;
-    --color-text: #2d3748;
-    --color-muted: #718096;
-    --border-radius: 18px;
-    --transition: all 0.3s ease;
-    --shadow-light: 0 8px 20px rgba(0,0,0,0.1);
-  }
+    <meta charset="UTF-8">
+    <title>SVVV | Academics</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --navy-dark: #0f2c4e; --accent-yellow: #fbbf24;
+            --bg-body: #f8fafc; --bg-surface: #ffffff; --text-main: #1e293b; --text-muted: #64748b; --border: #e2e8f0; --sidebar-width: 260px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg-body); color: var(--text-main); display: flex; min-height: 100vh; }
+        
+        .sidebar { width: var(--sidebar-width); background: var(--navy-dark); color: white; position: fixed; height: 100vh; display: flex; flex-direction: column; z-index: 100; }
+        .logo-area { padding: 2rem; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .logo-text { font-size: 2rem; font-weight: 800; letter-spacing: -1px; color: #fff; }
+        .logo-sub { font-size: 0.75rem; color: var(--accent-yellow); text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+        .nav-menu { padding: 2rem 1rem; flex: 1; list-style: none; }
+        .nav-link { display: flex; align-items: center; padding: 1rem; color: rgba(255,255,255,0.7); text-decoration: none; border-radius: 8px; margin-bottom: 0.5rem; font-weight: 500; transition: 0.2s; }
+        .nav-link:hover { color: #fff; background: rgba(255,255,255,0.05); }
+        .nav-link.active { background: var(--accent-yellow); color: var(--navy-dark); font-weight: 700; box-shadow: 0 4px 12px rgba(251, 191, 36, 0.3); }
+        .nav-link i { width: 24px; margin-right: 12px; }
 
-  * {
-    margin: 0; padding: 0; box-sizing: border-box;
-  }
-  body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background: var(--color-bg);
-    color: var(--color-text);
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-  }
-  .container {
-    max-width: 1400px;
-    margin: auto;
-    display: flex;
-    height: 100vh;
-    background: var(--color-card-bg);
-    border-radius: var(--border-radius);
-    box-shadow: var(--shadow-light);
-    overflow: hidden;
-  }
-  /* Sidebar */
-  nav.sidebar {
-    width: 260px;
-    background-color: var(--color-primary);
-    color: white;
-    display: flex;
-    flex-direction: column;
-    padding-top: 3rem;
-    user-select: none;
-  }
-  nav.sidebar h2 {
-    text-align: center;
-    margin-bottom: 3rem;
-    font-weight: 900;
-    font-size: 1.9rem;
-    letter-spacing: 2px;
-  }
-  nav.sidebar ul {
-    list-style-type: none;
-    flex-grow: 1;
-  }
-  nav.sidebar ul li {
-    padding: 18px 40px;
-    font-size: 1.15rem;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 18px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  nav.sidebar ul li:hover,
-  nav.sidebar ul li.active {
-    background-color: var(--color-primary-dark);
-  }
-  nav.sidebar ul li i {
-    font-size: 1.4rem;
-    width: 24px;
-    text-align: center;
-  }
+        .main { margin-left: var(--sidebar-width); flex: 1; padding: 2.5rem; }
+        
+        /* Tabs */
+        .tabs { display: flex; gap: 2rem; border-bottom: 2px solid #e2e8f0; margin-bottom: 2rem; }
+        .tab-btn { background: none; border: none; padding: 1rem 0; font-family: inherit; font-size: 1.1rem; font-weight: 600; color: var(--text-muted); cursor: pointer; position: relative; transition: 0.3s; }
+        .tab-btn:hover { color: var(--navy-dark); }
+        .tab-btn.active { color: var(--navy-dark); }
+        .tab-btn.active::after { content: ''; position: absolute; bottom: -2px; left: 0; width: 100%; height: 3px; background: var(--accent-yellow); }
 
-  /* Main content */
-  main {
-    flex-grow: 1;
-    overflow-y: auto;
-    padding: 30px 40px;
-    display: flex;
-    flex-direction: column;
-  }
-  header.main-header {
-    font-size: 2rem;
-    font-weight: 900;
-    color: var(--color-primary-dark);
-    margin-bottom: 30px;
-    user-select: none;
-  }
+        .content-section { display: none; animation: fadeIn 0.3s ease; }
+        .content-section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-  /* Tabs for modules inside main */
-  .tab-content {
-    flex-grow: 1;
-  }
+        /* Course Grid */
+        .courses-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; }
+        .course-card { background: #fff; border: 1px solid var(--border); border-radius: 12px; padding: 2rem; border-top: 5px solid var(--navy-dark); box-shadow: 0 4px 10px rgba(0,0,0,0.03); transition: 0.3s; }
+        .course-card:hover { transform: translateY(-5px); border-top-color: var(--accent-yellow); box-shadow: 0 15px 30px rgba(0,0,0,0.08); }
+        
+        /* Accordion */
+        .accordion-item { border: 1px solid var(--border); border-radius: 8px; margin-bottom: 10px; background: #fff; overflow: hidden; }
+        .accordion-header { padding: 1.2rem; cursor: pointer; font-weight: 700; color: var(--navy-dark); display: flex; justify-content: space-between; align-items: center; transition: 0.2s; }
+        .accordion-header:hover { background: #f8fafc; }
+        .accordion-header.open { background: var(--navy-dark); color: white; }
+        .accordion-body { padding: 0 1.2rem; max-height: 0; overflow: hidden; transition: 0.3s ease; background: #f8fafc; }
+        .accordion-body.open { padding: 1.2rem; max-height: 200px; }
 
-  /* Courses Section */
-  .courses-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px,1fr));
-    gap: 25px;
-  }
-  .course-card {
-    background: var(--color-card-bg);
-    border-radius: var(--border-radius);
-    padding: 25px 22px;
-    box-shadow: var(--shadow-light);
-    cursor: default;
-    transition: var(--transition);
-    user-select: none;
-  }
-  .course-card:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 15px 40px rgba(90, 103, 216, 0.3);
-  }
-  .course-title {
-    font-weight: 700;
-    font-size: 1.25rem;
-    color: var(--color-primary);
-    margin-bottom: 12px;
-  }
-  .course-desc {
-    font-size: 1rem;
-    color: var(--color-muted);
-  }
-  /* Syllabus accordion */
-  .accordion-section {
-    margin-top: 30px;
-    max-width: 720px;
-    margin-left: auto;
-    margin-right: auto;
-  }
-  .accordion-item {
-    border-bottom: 1px solid #e2e8f0;
-  }
-  .accordion-header {
-    padding: 18px 16px;
-    font-weight: 700;
-    font-size: 1.15rem;
-    color: var(--color-primary-dark);
-    cursor: pointer;
-    user-select: none;
-    position: relative;
-  }
-  .accordion-header::after {
-    content: "\f078"; /* fontawesome chevron-down */
-    font-family: "Font Awesome 5 Free";
-    font-weight: 900;
-    position: absolute;
-    right: 16px;
-    top: 20px;
-    transition: transform 0.3s ease;
-  }
-  .accordion-header.active::after {
-    transform: rotate(180deg);
-  }
-  .accordion-body {
-    max-height: 0;
-    overflow: hidden;
-    padding: 0 18px;
-    font-size: 1rem;
-    color: var(--color-text);
-    transition: max-height 0.35s ease;
-  }
-  .accordion-body.open {
-    max-height: 500px;
-    padding: 16px 18px 22px;
-  }
-  .syllabus-point {
-    margin-bottom: 8px;
-  }
+        /* Faculty */
+        .faculty-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; }
+        .faculty-card { background: #fff; padding: 2rem; border-radius: 12px; border: 1px solid var(--border); text-align: center; }
+        .faculty-img { width: 80px; height: 80px; border-radius: 50%; background: #e2e8f0; margin: 0 auto 1rem; border: 3px solid var(--navy-dark); object-fit: cover; }
 
-  /* Academic Calendar */
-  .calendar {
-    max-width: 720px;
-    margin: 0 auto 40px;
-  }
-  .calendar-header {
-    font-weight: 800;
-    font-size: 1.6rem;
-    color: var(--color-primary-dark);
-    margin-bottom: 16px;
-  }
-  .calendar-list {
-    list-style: none;
-    border-radius: var(--border-radius);
-    background: var(--color-card-bg);
-    box-shadow: var(--shadow-light);
-    padding: 25px 28px;
-  }
-  .event-item {
-    margin-bottom: 16px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid #e2e8f0;
-  }
-  .event-title {
-    font-weight: 700;
-    font-size: 1.1rem;
-    color: var(--color-primary);
-  }
-  .event-date {
-    font-weight: 600;
-    color: var(--color-muted);
-    margin-top: 4px;
-  }
-  .event-desc {
-    margin-top: 6px;
-    color: var(--color-text);
-  }
-
-  /* Timetable */
-  .timetable {
-    overflow-x: auto;
-  }
-  table.timetable-table {
-    border-collapse: collapse;
-    width: 100%;
-    min-width: 720px;
-    border-radius: var(--border-radius);
-    overflow: hidden;
-    box-shadow: var(--shadow-light);
-  }
-  table.timetable-table th,
-  table.timetable-table td {
-    border: 1px solid #e2e8f0;
-    padding: 16px 12px;
-    text-align: center;
-    font-weight: 600;
-    font-size: 1rem;
-    user-select: none;
-  }
-  table.timetable-table th {
-    background-color: var(--color-primary);
-    color: white;
-  }
-  table.timetable-table td.subject {
-    background-color: #e0e7ff;
-    font-weight: 700;
-    cursor: default;
-    white-space: nowrap;
-  }
-  table.timetable-table td.subject:hover {
-    background-color: #c7d2fe;
-  }
-
-  /* Faculty Directory */
-  .faculty-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 30px;
-    max-width: 1000px;
-    margin: 0 auto;
-  }
-  .faculty-card {
-    background: var(--color-card-bg);
-    border-radius: var(--border-radius);
-    padding: 28px 26px;
-    box-shadow: var(--shadow-light);
-    cursor: default;
-    transition: var(--transition);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    user-select: none;
-  }
-  .faculty-photo {
-    width: 90px;
-    height: 90px;
-    border-radius: 50%;
-    object-fit: cover;
-    margin-bottom: 18px;
-    border: 3px solid var(--color-primary);
-    box-shadow: 0 4px 10px rgba(102, 126, 234, 0.3);
-  }
-  .faculty-name {
-    font-weight: 800;
-    font-size: 1.25rem;
-    color: var(--color-primary-dark);
-    margin-bottom: 6px;
-  }
-  .faculty-subjects {
-    font-size: 0.95rem;
-    color: var(--color-muted);
-    user-select: text;
-  }
-
-  /* Study Materials */
-  .materials-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    gap: 24px;
-    max-width: 960px;
-    margin: 0 auto;
-  }
-  .material-card {
-    background: var(--color-card-bg);
-    border-radius: var(--border-radius);
-    padding: 24px 28px;
-    box-shadow: var(--shadow-light);
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    user-select: none;
-  }
-  .material-title {
-    font-weight: 700;
-    font-size: 1.3rem;
-    color: var(--color-primary);
-    margin-bottom: 14px;
-  }
-  .material-desc {
-    font-size: 1rem;
-    color: var(--color-muted);
-    margin-bottom: 24px;
-  }
-  .material-actions {
-    margin-top: auto;
-  }
-  .btn {
-    background-color: var(--color-primary);
-    border: none;
-    color: white;
-    padding: 14px 28px;
-    border-radius: var(--border-radius);
-    font-weight: 800;
-    cursor: pointer;
-    box-shadow: var(--shadow-light);
-    transition: var(--transition);
-    font-size: 1.05rem;
-    display: inline-flex;
-    align-items: center;
-    gap: 12px;
-    user-select: none;
-  }
-  .btn i {
-    font-size: 1.3rem;
-  }
-  .btn:hover {
-    background-color: var(--color-primary-dark);
-    box-shadow: 0 20px 50px rgba(66, 102, 239, 0.4);
-    transform: translateY(-3px);
-  }
-
-  /* Responsive */
-  @media (max-width: 1024px) {
-    .container {
-      flex-direction: column;
-      height: auto;
-      border-radius: var(--border-radius);
-      box-shadow: var(--shadow-md);
-    }
-    nav.sidebar {
-      flex-direction: row;
-      width: 100%;
-      padding: 12px 14px;
-      order: 1;
-      height: 70px;
-      overflow-x: auto;
-    }
-    nav.sidebar h2 { display: none; }
-    nav.sidebar ul {
-      display: flex;
-      gap: 24px;
-      width: auto;
-    }
-    nav.sidebar ul li {
-      padding: 0 10px;
-      font-size: 1rem;
-    }
-    main {
-      order: 2;
-      padding: 20px 24px 40px;
-      height: auto;
-    }
-    table.timetable-table {
-      min-width: 100%;
-    }
-  }
-
-  @media (max-width: 480px) {
-    main { padding: 16px 18px; }
-    .header h1 { font-size: 2rem; }
-    .courses-list, .faculty-grid, .materials-grid {
-      grid-template-columns: 1fr;
-    }
-  }
-</style>
+        @media (max-width: 768px) { .sidebar { display: none; } .main { margin-left: 0; padding: 1rem; } }
+    </style>
 </head>
 <body>
-  <div class="container" role="main">
-    <nav class="sidebar" aria-label="Academic Navigation">
-      <h2>Academics</h2>
-      <ul role="tablist">
-        <li class="active" role="tab" tabindex="0" aria-selected="true" aria-controls="tab-courses" id="tab-courses-btn">
-          <i class="fas fa-book-reader"></i> Courses
-        </li>
-        <li role="tab" tabindex="-1" aria-selected="false" aria-controls="tab-calendar" id="tab-calendar-btn">
-          <i class="fas fa-calendar-alt"></i> Calendar
-        </li>
-        <li role="tab" tabindex="-1" aria-selected="false" aria-controls="tab-timetable" id="tab-timetable-btn">
-          <i class="fas fa-table"></i> Timetable
-        </li>
-        <li role="tab" tabindex="-1" aria-selected="false" aria-controls="tab-materials" id="tab-materials-btn">
-          <i class="fas fa-file-alt"></i> Materials
-        </li>
-        <li role="tab" tabindex="-1" aria-selected="false" aria-controls="tab-faculty" id="tab-faculty-btn">
-          <i class="fas fa-chalkboard-teacher"></i> Faculty
-        </li>
-      </ul>
+    <nav class="sidebar">
+        <div class="logo-area"><div class="logo-text">SVVV</div><div class="logo-sub">Student Portal</div></div>
+        <ul class="nav-menu">
+            <li><a href="dashboard.html" class="nav-link"><i class="fas fa-th-large"></i> Dashboard</a></li>
+            <li><a href="schedule.html" class="nav-link"><i class="far fa-calendar-alt"></i> Schedule</a></li>
+            <li><a href="resources.html" class="nav-link"><i class="fas fa-layer-group"></i> Resources</a></li>
+            <li><a href="academics.html" class="nav-link active"><i class="fas fa-graduation-cap"></i> Academics</a></li>
+            <li><a href="collaboration.html" class="nav-link"><i class="fas fa-users"></i> Collaboration</a></li>
+        </ul>
     </nav>
-    <main aria-live="polite">
-      <header class="main-header" id="pageTitle" aria-live="assertive" aria-atomic="true">Courses</header>
-
-      <!-- Courses Tab -->
-      <section id="tab-courses" class="tab-content" role="tabpanel" aria-labelledby="tab-courses-btn">
-        <div class="courses-list" id="coursesList"></div>
-        <div class="accordion-section" id="syllabusAccordions" aria-label="Semester wise syllabus"></div>
-      </section>
-
-      <!-- Calendar Tab -->
-      <section id="tab-calendar" class="tab-content" role="tabpanel" aria-labelledby="tab-calendar-btn" hidden>
-        <h3 class="calendar-header">Academic Calendar</h3>
-        <ul class="calendar-list" id="calendarList"></ul>
-      </section>
-
-      <!-- Timetable Tab -->
-      <section id="tab-timetable" class="tab-content" role="tabpanel" aria-labelledby="tab-timetable-btn" hidden>
-        <h3 class="calendar-header" style="margin-bottom: 24px;">Timetable Viewer</h3>
-        <div class="timetable" tabindex="0" aria-label="Student timetable">
-          <table class="timetable-table" role="table">
-            <thead>
-              <tr>
-                <th scope="col">Time & Day</th>
-                <th scope="col">Monday</th>
-                <th scope="col">Tuesday</th>
-                <th scope="col">Wednesday</th>
-                <th scope="col">Thursday</th>
-                <th scope="col">Friday</th>
-              </tr>
-            </thead>
-            <tbody id="timetableBody"></tbody>
-          </table>
+    <main class="main">
+        <h1 style="font-size: 2.5rem; font-weight: 800; color: var(--navy-dark); margin-bottom: 2rem;">Academics</h1>
+        
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('courses')">My Courses</button>
+            <button class="tab-btn" onclick="switchTab('syllabus')">Syllabus</button>
+            <button class="tab-btn" onclick="switchTab('faculty')">Faculty</button>
         </div>
-      </section>
 
-      <!-- Materials Tab -->
-      <section id="tab-materials" class="tab-content" role="tabpanel" aria-labelledby="tab-materials-btn" hidden>
-        <h3 class="calendar-header">Study Materials & Lecture Notes</h3>
-        <div class="materials-grid" id="materialsGrid"></div>
-      </section>
+        <div id="courses" class="content-section active">
+            <div class="courses-grid">
+                <div class="course-card">
+                    <h3 style="color:var(--navy-dark); margin-bottom:0.5rem;">Data Structures</h3>
+                    <p style="color:var(--text-muted);">Fundamental data organization.</p>
+                </div>
+                <div class="course-card">
+                    <h3 style="color:var(--navy-dark); margin-bottom:0.5rem;">Operating Systems</h3>
+                    <p style="color:var(--text-muted);">Process and memory management.</p>
+                </div>
+                <div class="course-card">
+                    <h3 style="color:var(--navy-dark); margin-bottom:0.5rem;">Database Systems</h3>
+                    <p style="color:var(--text-muted);">SQL and relational theory.</p>
+                </div>
+            </div>
+        </div>
 
-      <!-- Faculty Tab -->
-      <section id="tab-faculty" class="tab-content" role="tabpanel" aria-labelledby="tab-faculty-btn" hidden>
-        <h3 class="calendar-header">Faculty Directory</h3>
-        <div class="faculty-grid" id="facultyGrid"></div>
-      </section>
+        <div id="syllabus" class="content-section">
+            <div class="accordion-item">
+                <div class="accordion-header" onclick="toggleAcc(this)">Semester 1 <i class="fas fa-chevron-down"></i></div>
+                <div class="accordion-body">
+                    <p>• Intro to Programming</p>
+                    <p>• Engineering Maths I</p>
+                    <p>• Physics</p>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <div class="accordion-header" onclick="toggleAcc(this)">Semester 2 <i class="fas fa-chevron-down"></i></div>
+                <div class="accordion-body">
+                    <p>• Data Structures</p>
+                    <p>• Digital Logic Design</p>
+                    <p>• Discrete Mathematics</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="faculty" class="content-section">
+            <div class="faculty-grid">
+                <div class="faculty-card">
+                    <img src="https://randomuser.me/api/portraits/women/44.jpg" class="faculty-img">
+                    <h4 style="color:var(--navy-dark);">Dr. Alice Smith</h4>
+                    <p style="color:var(--text-muted); font-size:0.9rem;">Data Structures</p>
+                </div>
+                <div class="faculty-card">
+                    <img src="https://randomuser.me/api/portraits/men/32.jpg" class="faculty-img">
+                    <h4 style="color:var(--navy-dark);">Prof. Bob Johnson</h4>
+                    <p style="color:var(--text-muted); font-size:0.9rem;">Operating Systems</p>
+                </div>
+            </div>
+        </div>
     </main>
-  </div>
 
-  <script>
-    // Tabs logic
-    const tabs = document.querySelectorAll('nav.sidebar ul li');
-    const contents = document.querySelectorAll('.tab-content');
-    const pageTitle = document.getElementById('pageTitle');
-
-    tabs.forEach(tab => {
-      tab.addEventListener('click', () => {
-        tabs.forEach(t => {
-          t.classList.remove('active');
-          t.setAttribute('aria-selected', 'false');
-          t.setAttribute('tabindex', '-1');
-        });
-        tab.classList.add('active');
-        tab.setAttribute('aria-selected', 'true');
-        tab.setAttribute('tabindex', '0');
-
-        const sel = tab.getAttribute('aria-controls');
-        contents.forEach(c => c.hidden = true);
-        document.getElementById(sel).hidden = false;
-        pageTitle.textContent = tab.textContent.trim();
-      });
-      tab.addEventListener('keydown', e => {
-        if(e.key === 'ArrowDown' || e.key === 'ArrowRight') {
-          e.preventDefault();
-          const next = tab.nextElementSibling || tabs[0];
-          next.focus();
-        } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
-          e.preventDefault();
-          const prev = tab.previousElementSibling || tabs[tabs.length - 1];
-          prev.focus();
+    <script>
+        function switchTab(id) {
+            document.querySelectorAll('.content-section').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            event.currentTarget.classList.add('active');
         }
-      });
-    });
 
-    // Dummy Data
-    const courses = [
-      {id: 1, title: "Data Structures & Algorithms", overview: "Study of fundamental data structures & algorithms."},
-      {id: 2, title: "Operating Systems", overview: "Concepts of OS including processes, threads, and memory management."},
-      {id: 3, title: "Database Systems", overview: "Relational databases, SQL and transaction management."},
-      {id: 4, title: "Computer Networks", overview: "Networking fundamentals, protocols and architectures."}
-    ];
-    const syllabi = {
-      "Semester 1": [
-        "Introduction to Programming",
-        "Mathematics I",
-        "Physics"
-      ],
-      "Semester 2": [
-        "Data Structures",
-        "Discrete Mathematics",
-        "Digital Logic Design"
-      ],
-      "Semester 3": [
-        "Operating Systems",
-        "Database Management Systems",
-        "Computer Organization"
-      ],
-      "Semester 4": [
-        "Computer Networks",
-        "Software Engineering",
-        "Theory of Computation"
-      ]
-    };
-    const calendarEvents = [
-      { id: 1, title: "Mid-Semester Exam", date: "2025-10-15", desc: "Core subjects and electives" },
-      { id: 2, title: "Hackathon Event", date: "2025-11-05", desc: "24-hour coding marathon" },
-      { id: 3, title: "Project Submission Deadline", date: "2025-12-01", desc: "Final year projects due" }
-    ];
-    const timetable = [
-      { time: "9:00 - 10:30", Monday: "Data Structures", Tuesday: "Operating Systems", Wednesday: "Database Systems", Thursday: "Computer Networks", Friday: "Programming Workshop" },
-      { time: "10:45 - 12:15", Monday: "Mathematics I", Tuesday: "Physics Lab", Wednesday: "Software Engg", Thursday: "Discrete Maths", Friday: "Project Meeting" },
-      { time: "1:00 - 2:30", Monday: "Algorithms", Tuesday: "Database Lab", Wednesday: "Network Lab", Thursday: "Theory of Computation", Friday: "Guest Lecture" }
-    ];
-    const materials = [
-      { title: "Data Structures Notes", desc: "Comprehensive notes for all data structures topics.", link: "#" },
-      { title: "Operating Systems Slides", desc: "Slides from OS lectures covering key topics.", link: "#" },
-      { title: "Database SQL Tutorial", desc: "Step-by-step SQL tutorial with exercises.", link: "#" },
-      { title: "Networking Basics PDF", desc: "Introductory PDF on computer networks.", link: "#" }
-    ];
-    const faculty = [
-      { name: "Dr. Alice Smith", subjects: ["Data Structures", "Algorithms"], photo: "https://randomuser.me/api/portraits/women/65.jpg" },
-      { name: "Prof. Bob Johnson", subjects: ["Operating Systems", "Software Engineering"], photo: "https://randomuser.me/api/portraits/men/44.jpg" },
-      { name: "Dr. Clara Patel", subjects: ["Database Systems", "Theory of Computation"], photo: "https://randomuser.me/api/portraits/women/43.jpg" },
-      { name: "Prof. David Lee", subjects: ["Computer Networks", "Network Lab"], photo: "https://randomuser.me/api/portraits/men/33.jpg" }
-    ];
-
-    // Render courses
-    const coursesList = document.getElementById('coursesList');
-    courses.forEach(course => {
-      const div = document.createElement('div');
-      div.className = 'course-card';
-      div.innerHTML = `<div class="course-title">${course.title}</div><div class="course-desc">${course.overview}</div>`;
-      coursesList.appendChild(div);
-    });
-
-    // Render syllabus accordions
-    const syllabusContainer = document.getElementById('syllabusAccordions');
-    Object.entries(syllabi).forEach(([semester, topics]) => {
-      const item = document.createElement('div');
-      item.className = 'accordion-item';
-      item.innerHTML = `
-        <div class="accordion-header" tabindex="0">${semester}</div>
-        <div class="accordion-body">${topics.map(t => `<div class="syllabus-point">• ${t}</div>`).join('')}</div>
-      `;
-      syllabusContainer.appendChild(item);
-    });
-
-    // Accordion functionality
-    syllabusContainer.querySelectorAll('.accordion-header').forEach(header => {
-      header.addEventListener('click', () => {
-        const body = header.nextElementSibling;
-        const isOpen = body.classList.contains('open');
-        if (isOpen) {
-          body.classList.remove('open');
-          header.classList.remove('active');
-        } else {
-          // Close all first
-          syllabusContainer.querySelectorAll('.accordion-body').forEach(b => b.classList.remove('open'));
-          syllabusContainer.querySelectorAll('.accordion-header').forEach(h => h.classList.remove('active'));
-          // Open current
-          body.classList.add('open');
-          header.classList.add('active');
+        function toggleAcc(el) {
+            el.classList.toggle('open');
+            el.nextElementSibling.classList.toggle('open');
         }
-      });
-      header.addEventListener('keydown', (e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          header.click();
-        }
-      });
-    });
-
-    // Render academic calendar
-    const calendarList = document.getElementById('calendarList');
-    calendarEvents.forEach(ev => {
-      const li = document.createElement('li');
-      li.className = "event-item";
-      li.innerHTML = `<div class="event-title">${ev.title}</div><div class="event-date">${new Date(ev.date).toLocaleDateString()}</div><div class="event-desc">${ev.desc}</div>`;
-      calendarList.appendChild(li);
-    });
-
-    // Render timetable
-    const timetableBody = document.getElementById('timetableBody');
-    timetable.forEach(slot => {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <th scope="row">${slot.time}</th>
-        <td class="subject">${slot.Monday}</td>
-        <td class="subject">${slot.Tuesday}</td>
-        <td class="subject">${slot.Wednesday}</td>
-        <td class="subject">${slot.Thursday}</td>
-        <td class="subject">${slot.Friday}</td>
-      `;
-      timetableBody.appendChild(tr);
-    });
-
-    // Render study materials
-    const materialsGrid = document.getElementById('materialsGrid');
-    materials.forEach(mat => {
-      const div = document.createElement('div');
-      div.className = 'material-card';
-      div.innerHTML = `
-        <div class="material-title">${mat.title}</div>
-        <div class="material-desc">${mat.desc}</div>
-        <div class="material-actions">
-          <a href="${mat.link}" class="btn" target="_blank" rel="noopener"><i class="fas fa-download"></i> Download</a>
-        </div>
-      `;
-      materialsGrid.appendChild(div);
-    });
-
-    // Render faculty
-    const facultyGrid = document.getElementById('facultyGrid');
-    faculty.forEach(f => {
-      const div = document.createElement('div');
-      div.className = 'faculty-card';
-      div.innerHTML = `
-        <img src="${f.photo}" alt="Photo of ${f.name}" class="faculty-photo" loading="lazy" />
-        <div class="faculty-name">${f.name}</div>
-        <div class="faculty-subjects">Subjects: ${f.subjects.join(', ')}</div>
-      `;
-      facultyGrid.appendChild(div);
-    });
-
-  </script>
+    </script>
 </body>
 </html>
