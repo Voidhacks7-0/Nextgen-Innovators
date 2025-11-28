@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>College Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f7fa; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+        .header h1 { font-size: 1.5rem; }
+        .notifications { position: relative; cursor: pointer; }
+        .notification-count { background: #ff4757; color: white; border-radius: 50%; padding: 0.2rem 0.5rem; font-size: 0.8rem; }
+        .notifications-dropdown { position: absolute; top: 100%; right: 0; background: white; min-width: 300px; border-radius: 8px; box-shadow: 0 8px 32px rgba(0,0,0,0.1); display: none; z-index: 1000; }
+        .notifications-dropdown.show { display: block; }
+        .notification-item { padding: 1rem; border-bottom: 1px solid #eee; }
+        .notification-item.new { background: #e3f2fd; }
+        .main-container { display: flex; min-height: calc(100vh - 80px); }
+        .sidebar { width: 250px; background: white; box-shadow: 2px 0 10px rgba(0,0,0,0.1); }
+        .sidebar-nav { list-style: none; padding: 1rem 0; }
+        .sidebar-nav li { padding: 1rem 1.5rem; cursor: pointer; transition: all 0.3s; }
+        .sidebar-nav li:hover, .sidebar-nav li.active { background: #667eea; color: white; }
+        .sidebar-nav a { color: inherit; text-decoration: none; display: flex; align-items: center; gap: 0.5rem; }
+        .dashboard-content { flex: 1; padding: 2rem; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin-bottom: 2rem; }
+        .card { background: white; border-radius: 12px; padding: 1.5rem; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+        .card h3 { margin-bottom: 1rem; color: #333; display: flex; align-items: center; }
+        .card h3 i { margin-right: 0.5rem; color: #667eea; }
+        .calendar { height: 400px; background: #f8f9fa; border-radius: 8px; padding: 1rem; }
+        .booking-form { display: flex; gap: 1rem; flex-wrap: wrap; }
+        .booking-form input, .booking-form select, .booking-form button { padding: 0.8rem; border: 1px solid #ddd; border-radius: 6px; flex: 1; min-width: 120px; }
+        .booking-form button { background: #28a745; color: white; border: none; cursor: pointer; }
+        .booking-form button:hover { background: #218838; }
+        .forum-posts { max-height: 300px; overflow-y: auto; }
+        .post { padding: 1rem; border-bottom: 1px solid #eee; }
+        .post-header { font-weight: bold; color: #667eea; margin-bottom: 0.5rem; }
+        .fab { position: fixed; bottom: 2rem; right: 2rem; width: 60px; height: 60px; background: #ff6b6b; color: white; border: none; border-radius: 50%; font-size: 1.5rem; cursor: pointer; box-shadow: 0 4px 20px rgba(255,107,107,0.4); }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1><i class="fas fa-graduation-cap"></i> College Dashboard</h1>
+        <div class="notifications" id="notifToggle">
+            <i class="fas fa-bell" style="font-size: 1.5rem;"></i>
+            <span class="notification-count" id="notifCount">3</span>
+            <div class="notifications-dropdown" id="notifications">
+                <div class="notification-item new">
+                    <strong>Exam Tomorrow!</strong><br>Final Math Exam at 9 AM
+                </div>
+                <div class="notification-item">
+                    <strong>Assignment Due</strong><br>Submit Project Report by 5 PM
+                </div>
+                <div class="notification-item new">
+                    <strong>Hackathon Registration</strong><br>Team up for weekend event!
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <nav class="sidebar">
+            <ul class="sidebar-nav">
+                <li class="active"><a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                <li><a href="schedule.html"><i class="fas fa-clock"></i> Schedule</a></li>
+                <li><a href="resources.html"><i class="fas fa-book"></i></a>Resource</a></li>
+                <li><a href="collaboration.html"><i class="fas fa-users"></i> Collaboration</a></li>
+                <li><a href="academics.html"><i class="fas fa-chart-line"></i> Academics</a></li>
+            </ul>
+        </nav>
+
+        <main class="dashboard-content">
+            <div class="grid">
+                <div class="card">
+                    <h3><i class="fas fa-calendar-check"></i> Upcoming Events</h3>
+                    <div id="events">
+                        <div>📚 Library closed - Nov 29</div>
+                        <div>⚽ Sports Day - Dec 5</div>
+                        <div>🎓 Parent Meeting - Dec 10</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3><i class="fas fa-comments"></i> Campus Forum</h3>
+                    <div class="forum-posts">
+                        <div class="post">
+                            <div class="post-header">Alice - 10:12 AM</div>
+                            <div>Looking for teammates for the hackathon.</div>
+                        </div>
+                        <div class="post">
+                            <div class="post-header">Bob - 9:45 AM</div>
+                            <div>Study group for Calculus tomorrow?</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3><i class="fas fa-map-marker-alt"></i> Campus Map</h3>
+                <div style="height:200px;background:#f0f2f6;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#999;">Map placeholder</div>
+            </div>
+        </main>
+    </div>
+
+    <button class="fab" title="Create">+</button>
+
+    <script>
+        // notification dropdown toggle
+        const notifToggle = document.getElementById('notifToggle');
+        const notifications = document.getElementById('notifications');
+
+        notifToggle.addEventListener('click', (e) => {
+            notifications.classList.toggle('show');
+            e.stopPropagation();
+        });
+
+        // close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!notifications.contains(e.target) && notifications.classList.contains('show')) {
+                notifications.classList.remove('show');
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campus Connect - Schedule</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .filters {
+            background: white;
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .filter-group label {
+            font-weight: 600;
+            color: #555;
+            font-size: 0.95rem;
+        }
+
+        .filter-group select {
+            padding: 12px 20px;
+            border: 2px solid #e1e5e9;
+            border-radius: 12px;
+            background: white;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filter-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Today's Schedule */
+        .today-schedule {
+            grid-column: 1;
+        }
+
+        .schedule-item {
+            background: linear-gradient(135deg, #667eea15, #764ba215);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 15px;
+            border-left: 4px solid #667eea;
+            transition: all 0.3s ease;
+        }
+
+        .schedule-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.15);
+        }
+
+        .schedule-time {
+            font-size: 0.9rem;
+            color: #667eea;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .schedule-subject {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 5px;
+        }
+
+        .schedule-details {
+            display: flex;
+            gap: 15px;
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        .schedule-status {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .status-upcoming {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .status-live {
+            background: #c8e6c9;
+            color: #2e7d32;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        /* Timetable */
+        .timetable {
+            grid-column: 1 / -1;
+        }
+
+        .timetable-header {
+            display: grid;
+            grid-template-columns: 100px repeat(6, 1fr);
+            gap: 2px;
+            margin-bottom: 2px;
+        }
+
+        .time-slot {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px 10px;
+            text-align: center;
+            font-weight: 600;
+            border-radius: 12px 12px 0 0;
+            font-size: 0.9rem;
+        }
+
+        .day-header {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            color: white;
+            padding: 15px 10px;
+            text-align: center;
+            font-weight: 700;
+            font-size: 0.95rem;
+            border-radius: 0 0 12px 12px;
+        }
+
+        .timetable-grid {
+            display: grid;
+            grid-template-columns: 100px repeat(6, 1fr);
+            gap: 2px;
+            height: 600px;
+        }
+
+        .time-label {
+            background: #f8fafc;
+            padding: 20px 10px;
+            text-align: center;
+            font-weight: 600;
+            color: #64748b;
+            border-right: 2px solid #e2e8f0;
+            position: relative;
+        }
+
+        .timetable-cell {
+            background: #f8fafc;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .timetable-cell:hover {
+            background: #e3f2fd;
+            transform: scale(1.02);
+            border-color: #667eea;
+        }
+
+        .class-slot {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin: 4px;
+            position: absolute;
+            left: 4px;
+            right: 4px;
+            top: 50%;
+            transform: translateY(-50%);
+            box-shadow: 0 4px 12px rgba(79, 172, 254, 0.3);
+        }
+
+        .class-slot.lab {
+            background: linear-gradient(135deg, #43e97b, #38f9d7);
+        }
+
+        .class-slot.tutorial {
+            background: linear-gradient(135deg, #fa709a, #fee140);
+        }
+
+        /* Upcoming Classes */
+        .upcoming-classes {
+            grid-column: 1;
+        }
+
+        .upcoming-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: #f8fafc;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .upcoming-item:hover {
+            background: #e3f2fd;
+        }
+
+        .upcoming-time {
+            font-weight: 700;
+            color: #667eea;
+            font-size: 1.1rem;
+        }
+
+        .upcoming-subject {
+            color: #2d3748;
+            font-weight: 600;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .timetable {
+                grid-column: 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .filters {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .filter-group {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .timetable-grid {
+                grid-template-columns: 80px repeat(6, 1fr);
+                height: 500px;
+            }
+            
+            .time-label {
+                font-size: 0.8rem;
+                padding: 15px 5px;
+            }
+            
+            .class-slot {
+                font-size: 0.7rem;
+                padding: 6px 8px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 1.7rem;
+            }
+            
+            .timetable-grid {
+                display: block;
+                overflow-x: auto;
+            }
+            
+            .timetable-grid::-webkit-scrollbar {
+                height: 6px;
+            }
+        }
+
+        .empty-cell {
+            background: transparent;
+        }
+
+        .fab {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .fab:hover {
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-calendar-alt"></i> My Schedule</h1>
+            <p>Stay organized with your class timetable and upcoming sessions</p>
+        </div>
+
+        <div class="filters">
+            <div class="filter-group">
+                <label><i class="fas fa-filter"></i> Semester:</label>
+                <select id="semesterFilter">
+                    <option>All Semesters</option>
+                    <option>1st Semester</option>
+                    <option>2nd Semester</option>
+                    <option>3rd Semester</option>
+                    <option>4th Semester</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label><i class="fas fa-building"></i> Branch:</label>
+                <select id="branchFilter">
+                    <option>All Branches</option>
+                    <option>Computer Science</option>
+                    <option>Electronics</option>
+                    <option>Mechanical</option>
+                    <option>Civil</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label><i class="fas fa-chalkboard-teacher"></i> Faculty:</label>
+                <select id="facultyFilter">
+                    <option>All Faculty</option>
+                    <option>Dr. Smith</option>
+                    <option>Prof. Johnson</option>
+                    <option>Dr. Lee</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="content-grid">
+            <!-- Today's Schedule -->
+            <div class="card today-schedule">
+                <h2 class="section-title">
+                    <i class="fas fa-clock"></i> Today (Friday, Nov 28)
+                </h2>
+                <div class="schedule-item">
+                    <div class="schedule-time">10:00 AM - 11:30 AM</div>
+                    <div class="schedule-subject">Data Structures</div>
+                    <div class="schedule-details">
+                        <span>Room A-204</span>
+                        <span>Dr. Smith</span>
+                        <span class="schedule-status status-live">Live Now</span>
+                    </div>
+                </div>
+                <div class="schedule-item">
+                    <div class="schedule-time">2:00 PM - 3:30 PM</div>
+                    <div class="schedule-subject">Database Systems</div>
+                    <div class="schedule-details">
+                        <span>Lab B-101</span>
+                        <span>Prof. Johnson</span>
+                        <span class="schedule-status status-upcoming">Upcoming</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Upcoming Classes -->
+            <div class="card upcoming-classes">
+                <h2 class="section-title">
+                    <i class="fas fa-arrow-up"></i> Next 3 Classes
+                </h2>
+                <div class="upcoming-item">
+                    <div>
+                        <div class="upcoming-time">2:00 PM</div>
+                        <div class="upcoming-subject">Database Systems</div>
+                    </div>
+                    <div>Lab B-101</div>
+                </div>
+                <div class="upcoming-item">
+                    <div>
+                        <div class="upcoming-time">Sat 9:00 AM</div>
+                        <div class="upcoming-subject">Algorithms</div>
+                    </div>
+                    <div>Room A-305</div>
+                </div>
+                <div class="upcoming-item">
+                    <div>
+                        <div class="upcoming-time">Mon 10:00 AM</div>
+                        <div class="upcoming-subject">Web Development</div>
+                    </div>
+                    <div>Lab C-202</div>
+                </div>
+            </div>
+
+            <!-- Weekly Timetable -->
+            <div class="card timetable">
+                <h2 class="section-title">
+                    <i class="fas fa-table"></i> Weekly Timetable
+                </h2>
+                <div class="timetable-header">
+                    <div></div>
+                    <div class="day-header">Monday</div>
+                    <div class="day-header">Tuesday</div>
+                    <div class="day-header">Wednesday</div>
+                    <div class="day-header">Thursday</div>
+                    <div class="day-header">Friday</div>
+                    <div class="day-header">Saturday</div>
+                </div>
+                <div class="timetable-grid">
+                    <!-- Time Labels -->
+                    <div class="time-label">8:00-9:30</div>
+                    <div class="timetable-cell empty-cell"></div>
+                    <div class="timetable-cell">
+                        <div class="class-slot">Maths-I<br>Dr. Lee</div>
+                    </div>
+                    <div class="timetable-cell empty-cell"></div>
+                    <div class="timetable-cell">
+                        <div class="class-slot lab">Physics Lab</div>
+                    </div>
+                    <div class="timetable-cell empty-cell"></div>
+                    <div class="timetable-cell">
+                        <div class="class-slot tutorial">Maths Tutorial</div>
+                    </div>
+
+                    <div class="time-label">9:45-11:15</div>
+                    <div class="timetable-cell">
+                        <div class="class-slot">Programming<br>Prof. Smith</div>
+                    </div>
+                    <div class="timetable-cell empty-cell"></div>
+                    <div class="timetable-cell">
+                        <div class="class-slot">Maths-I<br>Dr. Lee</div>
+                    </div>
+                    <div class="timetable-cell empty-cell"></div>
+                    <div class="timetable-cell">
+                        <div class="class-slot">Data Structures</div>
+                    </div>
+                    <div class="timetable-cell empty-cell"></div>
+
+                    <div class="time-label">11:30-1:00</div>
+                    <div class="timetable-cell empty-cell"></div>
+                    <div class="timetable-cell">
+                        <div class="class-slot">Chemistry<br>Dr. Brown</div>
+                    </div>
+                    <div class="timetable-cell empty-cell"></div>
+                    <div class="timetable-cell">
+                        <div class="class-slot">Programming</div>
+                    </div>
+                    <div class="timetable-cell empty-cell"></div>
+                    <div class="timetable-cell">
+                        <div class="class-slot">Algorithms</div>
+                    </div>
+
+                    <div class="time-label">2:00-3:30</div>
+                    <div class="timetable-cell">
+                        <div class="class-slot">Data Structures</div>
+                    </div>
+                    <div class="timetable-cell empty-cell"></div>
+                    <div class="timetable-cell">
+                        <div class="class-slot tutorial">Programming Tutorial</div>
+                    </div>
+                    <div class="timetable-cell">
+                        <div class="class-slot">Data Structures</div>
+                    </div>
+                    <div class="timetable-cell">
+                        <div class="class-slot">Database Systems</div>
+                    </div>
+                    <div class="timetable-cell empty-cell"></div>
+
+                    <div class="time-label">3:45-5:15</div>
+                    <div class="timetable-cell empty-cell"></div>
+                    <div class="timetable-cell">
+                        <div class="class-slot lab">Chemistry Lab</div>
+                    </div>
+                    <div class="timetable-cell empty-cell"></div>
+                    <div class="timetable-cell">
+                        <div class="class-slot lab">Programming Lab</div>
+                    </div>
+                    <div class="timetable-cell empty-cell"></div>
+                    <div class="timetable-cell empty-cell"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button class="fab" onclick="addClass()">
+        <i class="fas fa-plus"></i>
+    </button>
+
+    <script>
+        // Filter functionality
+        document.querySelectorAll('select').forEach(select => {
+            select.addEventListener('change', function() {
+                // Add filter logic here
+                console.log('Filter applied:', this.id, this.value);
+            });
+        });
+
+        // Add class modal simulation
+        function addClass() {
+            alert('🗓️ Add New Class Modal would open here!\n\nFeatures to implement:\n• Add class details\n• Set recurring schedule\n• Assign faculty & room\n• Set notifications');
+        }
+
+        // Add some interactive hover effects
+        document.querySelectorAll('.timetable-cell').forEach(cell => {
+            cell.addEventListener('click', function() {
+                if (!this.classList.contains('empty-cell')) {
+                    const slot = this.querySelector('.class-slot');
+                    if (slot) {
+                        alert(`📚 Class Details:\n${slot.textContent}\n\n• Click to view full details\n• Join video class\n• Download materials`);
+                    }
+                }
+            });
+        });
+
+        // Simulate live class indicator
+        setInterval(() => {
+            const status = document.querySelector('.status-live');
+            if (status) {
+                status.textContent = ['Live Now', 'In Progress', 'Join Class'][Math.floor(Math.random() * 3)];
+            }
+        }, 5000);
+    </script>
+</body>
+</html>
