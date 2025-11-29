@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SVVV Student Portal | Placement Intelligence</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        /* Animations */
+        .fade-in { animation: fadeIn 0.4s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .loader {
+            border: 4px solid #e2e8f0;
+            border-top: 4px solid #fbbf24;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="text-slate-900">
+
+    <!-- SIDEBAR -->
+    <div class="fixed left-0 top-0 w-72 h-screen bg-[#0f172a] text-white flex flex-col z-50 transition-all duration-300 border-r border-slate-800 shadow-2xl">
+        <div class="p-8 pb-8">
+            <h1 class="text-4xl font-extrabold tracking-tight text-white leading-none">SVVV</h1>
+            <p class="text-xs text-[#fbbf24] font-bold mt-1.5 uppercase tracking-[0.15em]">Student Portal</p>
+        </div>
+
+        <nav class="flex-1 space-y-2 py-2">
+            <a href="dashboard.html" onclick="switchView('dashboard')" id="nav-dashboard" class="nav-item flex items-center px-6 py-3.5 mx-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl transition-all duration-200 group">
+                <i data-lucide="layout-dashboard" class="mr-4 w-5 h-5 stroke-[2] opacity-80 group-hover:opacity-100 transition-opacity"></i>
+                <span class="font-medium text-[16px] tracking-tight">Dashboard</span>
+            </a>
+             <a href="schedule.html" class="nav-item flex items-center px-6 py-3.5 mx-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl transition-all duration-200 group">
+                <i data-lucide="file-text" class="mr-4 w-5 h-5 stroke-[2] opacity-80 group-hover:opacity-100 transition-opacity"></i>
+                <span class="font-medium text-[16px] tracking-tight">Schedule</span>
+            </a>
+            
+            <a href="resources.html" class="nav-item flex items-center px-6 py-3.5 mx-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl transition-all duration-200 group">
+                <i data-lucide="file-text" class="mr-4 w-5 h-5 stroke-[2] opacity-80 group-hover:opacity-100 transition-opacity"></i>
+                <span class="font-medium text-[16px] tracking-tight">Resources</span>
+            </a>
+            <a href="academics.html" class="nav-item flex items-center px-6 py-3.5 mx-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl transition-all duration-200 group">
+                <i data-lucide="search" class="mr-4 w-5 h-5 stroke-[2] opacity-80 group-hover:opacity-100 transition-opacity"></i>
+                <span class="font-medium text-[16px] tracking-tight">Academics</span>
+            </a>
+             <a href="#" onclick="switchView('landing')" id="nav-landing" class="nav-item active flex items-center px-6 py-3.5 mx-4 bg-[#fbbf24] text-slate-900 rounded-xl shadow-[0_4px_14px_0_rgba(251,191,36,0.3)] font-bold transition-all duration-200 transform scale-[1.02]">
+                <i data-lucide="briefcase" class="mr-4 w-5 h-5 stroke-[2.5]"></i>
+                <span class="font-bold text-[16px] tracking-tight">Placement Prep</span>
+            </a>
+             <a href="collaboration.html" class="nav-item flex items-center px-6 py-3.5 mx-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl transition-all duration-200 group">
+                <i data-lucide="file-text" class="mr-4 w-5 h-5 stroke-[2] opacity-80 group-hover:opacity-100 transition-opacity"></i>
+                <span class="font-medium text-[16px] tracking-tight">Collaboration</span>
+            </a>
+        </nav>
+
+        <div class="p-8">
+             <a href="login.html" class="flex items-center text-slate-400 hover:text-white text-sm font-medium transition-colors">
+                <i data-lucide="log-out" class="mr-3 w-4 h-4 stroke-[2]"></i>
+                Logout
+             </a>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT AREA -->
+    <div class="ml-72 min-h-screen flex flex-col">
+        
+        <!-- TOP HEADER -->
+        <header class="h-20 bg-white border-b border-slate-200 flex items-center justify-between px-8 sticky top-0 z-40 shadow-sm">
+            <div>
+                <h2 class="text-2xl font-bold text-slate-800" id="header-title">Placement & Training</h2>
+                <p class="text-sm text-slate-500" id="header-subtitle">Company Insights & Mock Assessments</p>
+            </div>
+            <div class="flex items-center space-x-6">
+                <div class="px-4 py-1.5 bg-blue-50 text-blue-700 rounded-full text-xs font-bold border border-blue-200">
+                    Next Drive: Google (Nov 25)
+                </div>
+                <div class="flex items-center space-x-3 border-l pl-6">
+                    <div class="text-right hidden md:block">
+                        <p class="text-sm font-bold text-slate-800">Amitesh Paliwal</p>
+                        <p class="text-xs text-slate-500">CS • 850 Score</p>
+                    </div>
+                    <div class="w-10 h-10 rounded-full bg-[#fbbf24] text-[#0f172a] flex items-center justify-center font-bold text-lg shadow-md border-2 border-white">
+                        AP
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- DYNAMIC CONTENT CONTAINER -->
+        <main id="app-content" class="p-8 flex-1 relative overflow-hidden bg-[#f8fafc]">
+            <!-- Content injected via JS -->
+        </main>
+
+        <!-- COMPANY DETAILS MODAL -->
+        <div id="company-modal" class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center p-4 backdrop-blur-sm opacity-0 transition-opacity duration-300">
+            <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full transform scale-95 transition-transform duration-300" id="company-modal-content">
+                <!-- Content injected via JS -->
+            </div>
+        </div>
+
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // --- DATA ---
+        
+        // 1. Company Data (Mock Intelligence)
+        const companiesData = [
+            { 
+                id: 'google', name: 'Google', role: 'SDE-1', type: 'Product', freshers: true, 
+                logo: 'https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg', 
+                rounds: [
+                    { name: 'Resume Shortlisting', desc: 'GPA > 8.5, Active GitHub, Competitive Programming profile.' },
+                    { name: 'Online Coding Challenge', desc: '2 Questions (Graph/DP/Trees) - 60 Mins. Platform: HackerRank.' },
+                    { name: 'Technical Interview 1', desc: 'DSA Focus: Linked Lists, Stacks, Queues. (45 Mins)' },
+                    { name: 'Technical Interview 2', desc: 'Advanced DSA + System Design Basics. (45 Mins)' },
+                    { name: 'Googlyness Round', desc: 'Behavioral: Leadership principles and culture fit.' }
+                ]
+            },
+            { 
+                id: 'tcs', name: 'TCS', role: 'Ninja / Digital', type: 'Service', freshers: true, 
+                logo: 'https://upload.wikimedia.org/wikipedia/commons/b/b1/Tata_Consultancy_Services_Logo.svg', 
+                rounds: [
+                    { name: 'NQT (National Qualifier Test)', desc: 'Numerical Ability, Verbal, Reasoning + 2 Coding Questions.' },
+                    { name: 'Technical Interview', desc: 'Core CS: DBMS, OS, OOPs, Project Discussion.' },
+                    { name: 'HR Interview', desc: 'Relocation flexibility, Communication skills check.' }
+                ]
+            },
+            { 
+                id: 'amazon', name: 'Amazon', role: 'SDE', type: 'Product', freshers: true, 
+                logo: 'https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg', 
+                rounds: [
+                    { name: 'Online Assessment', desc: 'Debugging section, Aptitude, 2 Coding Questions.' },
+                    { name: 'Technical Interview 1', desc: 'Problem Solving: Trees, Graphs, HashMaps.' },
+                    { name: 'Technical Interview 2', desc: 'High-Level Design & Scalability.' },
+                    { name: 'Bar Raiser', desc: 'Leadership Principles + tough Technical scenario.' }
+                ]
+            },
+            { 
+                id: 'netflix', name: 'Netflix', role: 'Senior SDE', type: 'Product', freshers: false, 
+                logo: 'https://assets.nflxext.com/us/ffe/siteui/common/icons/nficon2016.png', 
+                rounds: [
+                    { name: 'Recruiter Screen', desc: 'Culture memo discussion & experience check.' },
+                    { name: 'Technical Screen', desc: 'Take-home coding assignment or remote pair programming.' },
+                    { name: 'Onsite Loop', desc: '4-5 rounds covering System Design, Coding, and Culture.' }
+                ]
+            },
+            { 
+                id: 'infosys', name: 'Infosys', role: 'Systems Engineer', type: 'Service', freshers: true, 
+                logo: 'https://upload.wikimedia.org/wikipedia/commons/9/95/Infosys_logo.svg', 
+                rounds: [
+                    { name: 'Online Test', desc: 'Aptitude, Logical Reasoning, Pseudo Code.' },
+                    { name: 'Technical Interview', desc: 'Basics of C/Java/Python, SQL queries.' },
+                    { name: 'HR Interview', desc: 'General behavioral questions.' }
+                ]
+            }
+        ];
+
+        // 2. Expanded Question Bank
+        const allQuestions = {
+            aptitude: [
+                { category: "Quant", title: "Time and Work", description: "A does work in 4h; B+C in 3h; A+C in 2h. B alone?", options: ["8h", "10h", "12h", "24h"], correct: 2, explanation: "B's 1hr work = (B+C) - C... Result is 1/12." },
+                { category: "Quant", title: "Profit & Loss", description: "Cost price is $50, Profit is 20%. Selling Price?", options: ["$60", "$70", "$55", "$65"], correct: 0, explanation: "20% of 50 is 10. 50 + 10 = 60." },
+                { category: "Quant", title: "Probability", description: "Probability of getting an even number on a dice roll?", options: ["1/2", "1/3", "1/6", "2/3"], correct: 0, explanation: "Even numbers are 2, 4, 6. So 3/6 = 1/2." },
+                { category: "Quant", title: "Permutations", description: "Ways to arrange letters of 'CAT'?", options: ["3", "6", "9", "12"], correct: 1, explanation: "3! = 3*2*1 = 6." },
+                
+                { category: "Logic", title: "Series", description: "2, 1, 1/2, 1/4... Next?", options: ["1/3", "1/8", "2/8", "1/16"], correct: 1, explanation: "Divide by 2 series." },
+                { category: "Logic", title: "Coding", description: "If CAT=3120, DOG=?", options: ["4157", "4158", "4159", "4156"], correct: 0, explanation: "D=4, O=15, G=7 -> 4157." },
+                { category: "Logic", title: "Direction", description: "Walk 5km North, then 3km South. How far from start?", options: ["2km North", "8km North", "2km South", "8km South"], correct: 0, explanation: "5 - 3 = 2km in the North direction." },
+                
+                { category: "Verbal", title: "Antonyms", description: "Opposite of ARTIFICIAL", options: ["Red", "Natural", "Truthful", "Solid"], correct: 1, explanation: "Artificial vs Natural." },
+                { category: "Verbal", title: "Synonyms", description: "Synonym of CANDID", options: ["Vague", "Frank", "Secretive", "Anxious"], correct: 1, explanation: "Candid means truthful/frank." },
+                { category: "Verbal", title: "Analogy", description: "Bird : Fly :: Fish : ?", options: ["Swim", "Walk", "Run", "Crawal"], correct: 0, explanation: "Action performed by the animal." }
+            ],
+            dsa: [
+                { category: "DSA", title: "BST", description: "Search complexity in balanced BST?", options: ["O(n)", "O(log n)", "O(1)", "O(n log n)"], correct: 1, explanation: "Height is log n." },
+                { category: "DSA", title: "Linked List", description: "Cycle detection algorithm?", options: ["Floyd's", "Binary Search", "Merge Sort", "BFS"], correct: 0, explanation: "Tortoise and Hare." },
+                { category: "DSA", title: "Stack", description: "Valid Parentheses problem uses?", options: ["Queue", "Stack", "Heap", "Graph"], correct: 1, explanation: "LIFO property." },
+                { category: "DSA", title: "Sorting", description: "Worst case of QuickSort?", options: ["O(n log n)", "O(n^2)", "O(n)", "O(log n)"], correct: 1, explanation: "When pivot selection is poor." },
+                { category: "DSA", title: "Graph", description: "BFS uses which data structure?", options: ["Stack", "Queue", "Array", "Tree"], correct: 1, explanation: "BFS explores neighbors level by level using a Queue." },
+                { category: "DSA", title: "Hashing", description: "Best case complexity of Hash Map search?", options: ["O(1)", "O(n)", "O(log n)", "O(n^2)"], correct: 0, explanation: "Direct access via key." },
+                { category: "DSA", title: "DP", description: "Knapsack problem type?", options: ["Greedy", "Dynamic Programming", "Divide & Conquer", "Backtracking"], correct: 1, explanation: "0/1 Knapsack is a classic DP problem." }
+            ]
+        };
+
+        let state = {
+            view: 'landing', // landing, config, test, analysis, reports
+            chartInstance: null,
+            timer: 1800,
+            currentQIndex: 0,
+            userAnswers: {},
+            intervalId: null,
+            activeQuestionBank: []
+        };
+
+        // --- CORE FUNCTIONS ---
+
+        function updateSidebar(activeId) {
+            document.querySelectorAll('.nav-item').forEach(el => {
+                el.className = 'nav-item flex items-center px-6 py-3.5 mx-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl transition-all duration-200 group';
+            });
+            const activeEl = document.getElementById(activeId);
+            if(activeEl) activeEl.className = 'nav-item active flex items-center px-6 py-3.5 mx-4 bg-[#fbbf24] text-slate-900 rounded-xl shadow-[0_4px_14px_0_rgba(251,191,36,0.3)] font-bold transition-all duration-200 transform scale-[1.02]';
+        }
+
+        function switchView(view) {
+            updateSidebar(`nav-${view}`);
+            // Cleanup
+            if(state.chartInstance) { state.chartInstance.destroy(); state.chartInstance = null; }
+            if(state.intervalId) clearInterval(state.intervalId);
+
+            if (view === 'landing') renderLanding();
+            else if (view === 'config') renderConfig();
+            else if (view === 'test') renderTest();
+            else if (view === 'analysis') renderAnalysis();
+            else if (view === 'reports') renderReports();
+        }
+
+        // --- DASHBOARD VIEW ---
+        function renderDashboard() {
+            renderLanding();
+        }
+
+        // --- PLACEMENT LANDING ---
+        function renderLanding() {
+            updateSidebar('nav-landing');
+            document.getElementById('header-title').innerText = "Placement";
+            document.getElementById('header-subtitle').innerText = "AI Interview Prep & Company Selection";
+            document.getElementById('app-content').innerHTML = `
+                <div class="space-y-8 fade-in">
+                    
+                    <!-- Company Explorer Section -->
+                    <div>
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="font-bold text-slate-800 text-lg">Company Recruitment Processes</h3>
+                            <div class="flex gap-2">
+                                <button onclick="renderCompanyGrid('all')" class="px-4 py-1.5 rounded-full text-xs font-bold bg-slate-200 text-slate-600 hover:bg-[#fbbf24] hover:text-slate-900 transition shadow-sm">All</button>
+                                <button onclick="renderCompanyGrid('freshers')" class="px-4 py-1.5 rounded-full text-xs font-bold bg-slate-200 text-slate-600 hover:bg-[#fbbf24] hover:text-slate-900 transition shadow-sm">Freshers Eligible</button>
+                                <button onclick="renderCompanyGrid('Product')" class="px-4 py-1.5 rounded-full text-xs font-bold bg-slate-200 text-slate-600 hover:bg-[#fbbf24] hover:text-slate-900 transition shadow-sm">Product Based</button>
+                                <button onclick="renderCompanyGrid('Service')" class="px-4 py-1.5 rounded-full text-xs font-bold bg-slate-200 text-slate-600 hover:bg-[#fbbf24] hover:text-slate-900 transition shadow-sm">Service Based</button>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="company-grid">
+                            <!-- Cards injected here -->
+                        </div>
+                    </div>
+
+                    <!-- Performance Chart -->
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+                        <h3 class="font-bold text-slate-800 mb-6 flex items-center">
+                            <i data-lucide="bar-chart-2" class="mr-2 w-5 h-5 text-slate-400"></i> Performance History
+                        </h3>
+                        <div class="h-64 w-full"><canvas id="historyChart"></canvas></div>
+                    </div>
+                </div>`;
+            
+            lucide.createIcons();
+            renderCompanyGrid('all');
+            initChart();
+        }
+
+        // --- CONFIGURATION PAGE ---
+        function renderConfig() {
+            document.getElementById('app-content').innerHTML = `
+                <div class="flex items-center justify-center h-full fade-in">
+                    <div class="bg-white p-10 rounded-3xl shadow-2xl max-w-lg w-full border border-slate-100 relative">
+                        <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-[#fbbf24] to-orange-400 rounded-t-3xl"></div>
+                        <h2 class="text-3xl font-bold text-slate-800 mb-2 mt-4">Configure Test</h2>
+                        <p class="text-slate-500 mb-8">Customize your assessment parameters.</p>
+                        
+                        <div class="space-y-6">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 uppercase mb-2">Target Company</label>
+                                <select id="company-select" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#fbbf24] outline-none font-medium transition-all hover:bg-white">
+                                    <option value="Google">Google</option>
+                                    <option value="Amazon">Amazon</option>
+                                    <option value="TCS">TCS</option>
+                                    <option value="Infosys">Infosys</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 uppercase mb-2">Test Focus</label>
+                                <select id="test-type" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#fbbf24] outline-none font-medium transition-all hover:bg-white">
+                                    <option value="dsa">DSA (Data Structures)</option>
+                                    <option value="aptitude">Aptitude & Logic</option>
+                                    <option value="mixed">Mixed Assessment</option>
+                                </select>
+                            </div>
+                            
+                            <div class="pt-4 flex gap-4">
+                                <button onclick="switchView('landing')" class="flex-1 py-3.5 text-slate-500 font-bold hover:text-slate-800 transition">Cancel</button>
+                                <button onclick="startTest()" class="flex-[2] py-3.5 bg-[#fbbf24] text-[#0f172a] font-bold rounded-xl hover:bg-amber-400 shadow-lg transition transform hover:-translate-y-0.5">
+                                    Launch Assessment
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+            lucide.createIcons();
+        }
+
+        // --- START TEST ---
+        function startTest() {
+            const company = document.getElementById('company-select').value;
+            const type = document.getElementById('test-type').value;
+            
+            // Build question bank based on type
+            if (type === 'dsa') state.activeQuestionBank = allQuestions.dsa;
+            else if (type === 'aptitude') state.activeQuestionBank = allQuestions.aptitude;
+            else state.activeQuestionBank = [...allQuestions.dsa, ...allQuestions.aptitude].sort(() => 0.5 - Math.random()).slice(0, 10); // Random mixed 10
+
+            state.userAnswers = {};
+            state.currentQIndex = 0;
+            state.timer = 1800; // 30 mins
+            
+            // Loading Screen
+            document.getElementById('app-content').innerHTML = `
+                <div class="flex flex-col items-center justify-center h-full fade-in">
+                    <div class="loader mb-6"></div>
+                    <h3 class="text-xl font-bold text-slate-800">Constructing Your Test...</h3>
+                    <p class="text-slate-500 mt-2">Fetching interview patterns for <span class="font-bold text-[#fbbf24]">${company}</span></p>
+                </div>`;
+            
+            setTimeout(() => switchView('test'), 1500);
+        }
+
+        // --- TEST INTERFACE ---
+        function renderTest() {
+            const q = state.activeQuestionBank[state.currentQIndex];
+            document.getElementById('app-content').innerHTML = `
+                <div class="h-full flex flex-col fade-in">
+                    <!-- Header -->
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex justify-between items-center mb-6">
+                        <div>
+                            <h2 class="font-bold text-xl text-slate-800">Live Assessment</h2>
+                            <span class="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded mt-1 inline-block">${q.category} Section</span>
+                        </div>
+                        <div class="flex items-center bg-[#0f172a] text-[#fbbf24] px-6 py-3 rounded-xl font-mono font-bold text-2xl shadow-md">
+                            <i data-lucide="clock" class="mr-3 w-6 h-6"></i>
+                            <span id="timer-display">30:00</span>
+                        </div>
+                    </div>
+
+                    <!-- Question Area -->
+                    <div class="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-8 min-h-0">
+                        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 flex flex-col overflow-y-auto relative">
+                            <div class="absolute top-0 left-0 w-1.5 h-full bg-[#fbbf24]"></div>
+                            <div class="flex items-center justify-between mb-6">
+                                <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">Question ${state.currentQIndex + 1} of ${state.activeQuestionBank.length}</span>
+                            </div>
+                            <h3 class="text-2xl font-bold text-slate-800 mb-6 leading-snug">${q.description}</h3>
+                        </div>
+
+                        <div class="bg-slate-50 rounded-2xl border border-slate-200 p-8 flex flex-col">
+                            <h4 class="text-sm font-bold text-slate-500 mb-6 uppercase tracking-wide">Select your answer</h4>
+                            <div class="flex-1 space-y-4" id="options-container"></div>
+                            
+                            <div class="mt-8 pt-6 border-t border-slate-200 flex justify-between items-center">
+                                <button onclick="changeQ(-1)" class="flex items-center text-slate-500 hover:text-slate-800 font-bold transition disabled:opacity-30" ${state.currentQIndex===0?'disabled':''}>
+                                    <i data-lucide="arrow-left" class="w-5 h-5 mr-2"></i> Previous
+                                </button>
+                                <button onclick="changeQ(1)" class="bg-[#0f172a] text-white hover:bg-slate-800 font-bold px-8 py-3 rounded-xl flex items-center shadow-lg transition transform hover:-translate-y-0.5">
+                                    ${state.currentQIndex===state.activeQuestionBank.length-1 ? 'Submit Test' : 'Next Question'} 
+                                    <i data-lucide="arrow-right" class="w-5 h-5 ml-2"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+            
+            const opts = document.getElementById('options-container');
+            q.options.forEach((opt, idx) => {
+                const isSel = state.userAnswers[state.currentQIndex] === idx;
+                opts.innerHTML += `
+                    <button onclick="selectAns(${idx})" class="w-full text-left p-5 rounded-xl border-2 transition-all duration-200 flex items-center group ${isSel ? 'border-[#fbbf24] bg-white shadow-md transform scale-[1.01]' : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50'}">
+                        <div class="w-6 h-6 rounded-full border-2 flex-shrink-0 flex items-center justify-center mr-4 ${isSel ? 'border-[#fbbf24] bg-[#fbbf24]' : 'border-slate-300 group-hover:border-slate-400'}">
+                            ${isSel ? '<i data-lucide="check" class="w-3 h-3 text-[#0f172a]"></i>' : ''}
+                        </div>
+                        <span class="font-semibold text-lg ${isSel?'text-slate-900':'text-slate-600'}">${opt}</span>
+                    </button>`;
+            });
+            lucide.createIcons();
+
+            if(!state.intervalId) state.intervalId = setInterval(() => {
+                state.timer--;
+                const m = Math.floor(state.timer/60); const s = state.timer%60;
+                const disp = document.getElementById('timer-display');
+                if(disp) disp.innerText = `${m}:${s<10?'0':''}${s}`;
+                if(state.timer<=0) { clearInterval(state.intervalId); switchView('analysis'); }
+            }, 1000);
+        }
+
+        window.selectAns = function(idx) {
+            state.userAnswers[state.currentQIndex] = idx;
+            renderTest();
+        }
+
+        window.changeQ = function(delta) {
+            if(state.currentQIndex === state.activeQuestionBank.length-1 && delta === 1) { 
+                switchView('analysis'); 
+                return; 
+            }
+            state.currentQIndex += delta;
+            renderTest();
+        }
+
+        // 4. ANALYSIS VIEW (PROBABILITY ENGINE)
+        function renderAnalysis() {
+            clearInterval(state.intervalId); state.intervalId = null;
+            let correct = 0;
+            state.activeQuestionBank.forEach((q,i) => { if(state.userAnswers[i] === q.correct) correct++; });
+            const percentage = Math.round((correct / state.activeQuestionBank.length) * 100);
+
+            // Selection Probability Logic
+            let probability = "Low";
+            let probColor = "text-red-500";
+            let probMsg = "Needs significant improvement.";
+            
+            if (percentage > 85) {
+                probability = "High"; probColor = "text-green-600"; probMsg = "You are ready for placements!";
+            } else if (percentage > 60) {
+                probability = "Moderate"; probColor = "text-yellow-600"; probMsg = "Good, but focus on weak areas.";
+            }
+
+            document.getElementById('app-content').innerHTML = `
+                <div class="fade-in pb-10">
+                    <div class="bg-[#0f172a] text-white p-8 rounded-3xl shadow-2xl mb-8 relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-64 h-64 bg-[#fbbf24] opacity-10 rounded-full blur-3xl -mr-16 -mt-16"></div>
+                        <div class="relative z-10 flex flex-col md:flex-row justify-between items-center">
+                            <div>
+                                <h2 class="text-3xl font-extrabold mb-2">Analysis Report</h2>
+                                <p class="text-slate-300">Detailed breakdown of your performance.</p>
+                            </div>
+                            <div class="text-right mt-6 md:mt-0 flex gap-8">
+                                <div>
+                                    <span class="block text-5xl font-extrabold text-[#fbbf24]">${percentage}%</span>
+                                    <span class="text-xs uppercase font-bold tracking-widest opacity-70">Score</span>
+                                </div>
+                                <div>
+                                    <span class="block text-5xl font-extrabold ${probColor}">${probability}</span>
+                                    <span class="text-xs uppercase font-bold tracking-widest opacity-70">Selection Chances</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200">
+                            <h3 class="font-bold text-slate-800 mb-6 text-center text-lg">Skill Radar</h3>
+                            <div class="h-80 relative"><canvas id="radarChart"></canvas></div>
+                        </div>
+                        
+                        <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 flex flex-col">
+                            <h3 class="font-bold text-slate-800 mb-6 text-lg flex items-center">
+                                <i data-lucide="file-search" class="w-5 h-5 mr-2 text-blue-500"></i> Detailed Solutions
+                            </h3>
+                            <div class="space-y-4 overflow-y-auto flex-1 pr-2 max-h-[400px]">
+                                ${state.activeQuestionBank.map((q,i) => `
+                                    <div class="p-6 rounded-xl border-l-4 ${state.userAnswers[i]===q.correct?'border-green-500 bg-green-50/50':'border-red-500 bg-red-50/50'}">
+                                        <h4 class="font-bold text-slate-800 text-sm mb-2">Q${i+1}: ${q.title}</h4>
+                                        <p class="text-slate-600 text-sm mb-3">${q.description}</p>
+                                        <div class="text-xs bg-white p-4 rounded-lg border border-slate-200 text-slate-600 leading-relaxed shadow-sm">
+                                            <span class="font-bold text-slate-900 block mb-1">Answer:</span> ${q.explanation}
+                                        </div>
+                                    </div>`).join('')}
+                            </div>
+                            <button onclick="switchView('landing')" class="mt-6 w-full bg-[#0f172a] text-white py-3.5 rounded-xl font-bold hover:bg-slate-800 transition shadow-lg">
+                                Return to Dashboard
+                            </button>
+                        </div>
+                    </div>
+                </div>`;
+            
+            lucide.createIcons();
+            
+            setTimeout(() => {
+                const ctx = document.getElementById('radarChart');
+                if(ctx) new Chart(ctx, {
+                    type: 'radar',
+                    data: {
+                        labels: ['Quantitative', 'Logical', 'Verbal', 'Speed', 'Accuracy'],
+                        datasets: [{
+                            label: 'You',
+                            data: [percentage-10, percentage, percentage+5, 85, percentage],
+                            fill: true,
+                            backgroundColor: 'rgba(15,23,42,0.6)',
+                            borderColor: '#0f172a',
+                            pointBackgroundColor: '#0f172a'
+                        }, {
+                            label: 'Topper Avg',
+                            data: [90, 85, 80, 95, 95],
+                            fill: true,
+                            backgroundColor: 'rgba(251,191,36,0.3)',
+                            borderColor: '#fbbf24',
+                            pointBackgroundColor: '#fbbf24'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: { r: { ticks: { display: false }, grid: { color: '#e2e8f0' } } },
+                        plugins: { legend: { position: 'bottom' } }
+                    }
+                });
+            }, 100);
+        }
+
+        // --- HELPERS: COMPANY GRID & CHARTS ---
+        function renderCompanyGrid(filter) {
+            const grid = document.getElementById('company-grid');
+            grid.innerHTML = '';
+            
+            const filtered = companiesData.filter(c => {
+                if (filter === 'all') return true;
+                if (filter === 'freshers') return c.freshers;
+                return c.type === filter;
+            });
+
+            filtered.forEach(c => {
+                grid.innerHTML += `
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 hover:shadow-lg hover:border-[#fbbf24] transition group cursor-pointer relative overflow-hidden" onclick="showCompanyModal('${c.id}')">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="w-12 h-12 bg-slate-50 rounded-xl p-2 flex items-center justify-center">
+                                <img src="${c.logo}" alt="${c.name}" class="w-full h-full object-contain">
+                            </div>
+                            <span class="px-2.5 py-1 bg-slate-100 text-slate-600 text-[10px] font-bold uppercase tracking-wider rounded-lg">${c.type}</span>
+                        </div>
+                        <h4 class="text-xl font-bold text-slate-800">${c.name}</h4>
+                        <p class="text-sm text-slate-500 mb-4">${c.role}</p>
+                        
+                        <div class="flex items-center text-xs font-bold ${c.freshers ? 'text-green-600' : 'text-red-500'} mb-6">
+                            <i data-lucide="${c.freshers ? 'check-circle' : 'x-circle'}" class="w-3 h-3 mr-1"></i>
+                            ${c.freshers ? 'Freshers Eligible' : 'Experience Required'}
+                        </div>
+
+                        <button class="w-full py-2.5 border border-slate-200 rounded-xl text-sm font-bold text-slate-600 group-hover:bg-[#0f172a] group-hover:text-white group-hover:border-[#0f172a] transition flex items-center justify-center">
+                            View Process <i data-lucide="arrow-right" class="w-4 h-4 ml-2"></i>
+                        </button>
+                    </div>
+                `;
+            });
+            lucide.createIcons();
+        }
+
+        function showCompanyModal(id) {
+            const company = companiesData.find(c => c.id === id);
+            const modal = document.getElementById('company-modal');
+            const content = document.getElementById('company-modal-content');
+            
+            content.innerHTML = `
+                <div class="p-8 relative">
+                    <button onclick="closeModal()" class="absolute top-4 right-4 p-2 bg-slate-100 rounded-full hover:bg-slate-200 transition">
+                        <i data-lucide="x" class="w-5 h-5 text-slate-500"></i>
+                    </button>
+                    
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-16 h-16 bg-slate-50 rounded-2xl p-3 flex items-center justify-center border border-slate-100">
+                            <img src="${company.logo}" class="w-full h-full object-contain">
+                        </div>
+                        <div>
+                            <h2 class="text-2xl font-bold text-slate-900">${company.name} Selection Process</h2>
+                            <p class="text-slate-500">${company.role} • ${company.type} Company</p>
+                        </div>
+                    </div>
+
+                    <div class="space-y-6 relative pl-4 border-l-2 border-slate-100 ml-4 mb-8">
+                        ${company.rounds.map((round, idx) => `
+                            <div class="relative pl-6">
+                                <div class="absolute -left-[25px] top-0 w-8 h-8 rounded-full bg-white border-2 border-[#fbbf24] flex items-center justify-center font-bold text-sm text-slate-800 shadow-sm">
+                                    ${idx + 1}
+                                </div>
+                                <h4 class="font-bold text-slate-800 text-lg">${round.name}</h4>
+                                <p class="text-sm text-slate-600 mt-1 leading-relaxed">${round.desc}</p>
+                            </div>
+                        `).join('')}
+                    </div>
+
+                    <div class="flex gap-4">
+                        <button onclick="closeModal()" class="flex-1 py-3 border border-slate-200 rounded-xl font-bold text-slate-600 hover:bg-slate-50">Close</button>
+                        <button onclick="startPrep('${company.name}')" class="flex-1 py-3 bg-[#fbbf24] text-[#0f172a] rounded-xl font-bold hover:bg-amber-400 shadow-lg flex justify-center items-center">
+                            <i data-lucide="play-circle" class="w-5 h-5 mr-2"></i> Start Prep for ${company.name}
+                        </button>
+                    </div>
+                </div>
+            `;
+            lucide.createIcons();
+            
+            modal.classList.remove('hidden', 'pointer-events-none');
+            // Small delay for transition
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                content.classList.remove('scale-95');
+                content.classList.add('scale-100');
+            }, 10);
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('company-modal');
+            const content = document.getElementById('company-modal-content');
+            
+            modal.classList.add('opacity-0');
+            content.classList.remove('scale-100');
+            content.classList.add('scale-95');
+            
+            setTimeout(() => {
+                modal.classList.add('hidden', 'pointer-events-none');
+            }, 300);
+        }
+
+        function startPrep(companyName) {
+            closeModal();
+            setTimeout(() => { switchView('config'); }, 300);
+        }
+
+        function initChart() {
+            setTimeout(() => {
+                const ctx = document.getElementById('historyChart');
+                if(ctx) {
+                    new Chart(ctx, {type:'bar', data: {labels:['Test 1','Test 2','Test 3'], datasets:[{label:'Your Score', data:[65,72,85], backgroundColor:'#0f172a', borderRadius:4},{label:'Avg', data:[55,58,62], backgroundColor:'#cbd5e1', borderRadius:4}]}, options:{responsive:true, maintainAspectRatio:false}});
+                }
+            }, 100);
+        }
+
+        // Init
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            switchView('landing');
+        });
+
+    </script>
+</body>
+</html>

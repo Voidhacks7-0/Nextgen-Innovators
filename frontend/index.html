@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SVVV College Indore</title>
+
+  <style>
+    /* Reset */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      overflow: hidden;
+    }
+
+    /* NAVBAR */
+    nav {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      background: rgba(0, 0, 0, 0.4);
+      padding: 15px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      backdrop-filter: blur(10px);
+      z-index: 10;
+    }
+
+    nav .logo {
+      font-size: 1.6rem;
+      color: white;
+      font-weight: 700;
+      letter-spacing: 1px;
+      transition: 0.3s;
+    }
+
+    nav .logo:hover {
+      transform: scale(1.1);
+      color: #ffea00;
+    }
+
+    nav .buttons a {
+      text-decoration: none;
+      margin-left: 20px;
+      padding: 10px 20px;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.15);
+      color: white;
+      font-weight: 500;
+      transition: 0.3s;
+      backdrop-filter: blur(5px);
+    }
+
+    nav .buttons a:hover {
+      background: white;
+      color: black;
+      transform: translateY(-4px) scale(1.08);
+      box-shadow: 0 5px 20px rgba(255,255,255,0.5);
+    }
+
+    /* Page Container */
+    .container {
+      scroll-snap-type: y mandatory;
+      overflow-y: scroll;
+      height: 100vh;
+    }
+
+    /* Sections */
+    .section {
+      height: 100vh;
+      scroll-snap-align: start;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      text-align: center;
+      transition: transform 1s;
+      perspective: 1000px;
+      padding: 0 20px;
+    }
+
+    .section:hover {
+      transform: rotateY(8deg) scale(1.04);
+    }
+
+    /* Section backgrounds */
+    .home {
+      background: url('https://www.svvv.edu.in/assets/images/slider/slide1.jpg') no-repeat center/cover;
+      background-color: #1f4037;
+    }
+
+    .about {
+      background: linear-gradient(135deg, #42275a, #734b6d);
+    }
+
+    .courses {
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+    }
+
+    .contact {
+      background: linear-gradient(135deg, #536976, #292e49);
+    }
+
+    h1, h2 {
+      font-size: 3rem;
+      margin-bottom: 20px;
+      text-shadow: 0 2px 5px rgba(0,0,0,0.5);
+    }
+
+    p {
+      font-size: 1.2rem;
+      max-width: 700px;
+      text-shadow: 0 1px 4px rgba(0,0,0,0.4);
+      line-height: 1.6;
+    }
+
+    /* Course Cards */
+    .course-cards {
+      display: flex;
+      gap: 20px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .card {
+      background: rgba(255,255,255,0.15);
+      padding: 20px 40px;
+      border-radius: 15px;
+      backdrop-filter: blur(10px);
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .card:hover {
+      transform: rotateY(15deg) scale(1.1);
+      background: rgba(255,255,255,0.3);
+    }
+  </style>
+</head>
+
+<body>
+
+ <nav>
+  <div class="logo">SVVV Indore</div>
+  <div class="buttons">
+    <a href="https://www.svvv.edu.in" target="_blank">Official Site</a>
+    <a href="index.html" target="_blank">ERP Portal</a>
+    <a href="#courses">Courses</a>
+    <a href="#contact">Contact</a>
+  </div>
+</nav>
+
+
+  <!-- MAIN PAGE SECTIONS -->
+  <div class="container">
+
+    <!-- Home Section -->
+    <section class="section home">
+      <h1>Welcome to SVVV College Indore</h1>
+      <p>Shri Vaishnav Vidyapeeth Vishwavidyalaya is a private university in Indore known for academic excellence, vibrant campus life, innovation, research, and industry-oriented programs.</p>
+    </section>
+
+    <!-- About Section -->
+    <section class="section about">
+      <h2>About SVVV</h2>
+      <p>SVVV was established with the vision to transform society through value-based education.  
+      The university offers engineering, management, sciences, humanities, and professional courses supported by modern infrastructure and highly experienced faculty.  
+      SVVV focuses on holistic development, research, skill building, and character formation.</p>
+    </section>
+
+    <!-- Courses Section -->
+    <section class="section courses" id="courses">
+      <h2>Courses Offered</h2>
+      <div class="course-cards">
+        <div class="card">B.Tech (All Branches)</div>
+        <div class="card">MBA & Executive MBA</div>
+        <div class="card">BBA / B.Com / BCA</div>
+        <div class="card">M.Tech</div>
+        <div class="card">Ph.D Programs</div>
+      </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="section contact" id="contact">
+      <h2>Contact Us</h2>
+      <p>Email: info@svvv.edu.in</p>
+      <p>Phone: +91 731 2471 999</p>
+      <p>Address: Indore, Madhya Pradesh, India</p>
+    </section>
+
+  </div>
+
+  <script>
+    // Smooth scroll on mouse wheel
+    document.querySelector('.container').addEventListener('wheel', function(e) {
+      e.preventDefault();
+      this.scrollBy({
+        top: e.deltaY,
+        behavior: 'smooth'
+      });
+    });
+  </script>
+
+</body>
+</html>

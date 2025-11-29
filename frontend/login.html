@@ -29,11 +29,9 @@
 </head>
 <body class="bg-pattern min-h-screen flex items-center justify-center p-4">
 
-    <div class="max-w-5xl w-full bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col md:flex-row fade-in h-[600px]">
+    <div class="max-w-5xl w-full bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col md:flex-row fade-in h-[650px] md:h-[600px]">
         
-        <!-- LEFT SIDE: BRANDING -->
         <div class="md:w-1/2 bg-navy text-white p-12 flex flex-col justify-between relative overflow-hidden">
-            <!-- Decorative Circles -->
             <div class="absolute top-0 left-0 w-64 h-64 bg-[#fbbf24] rounded-full mix-blend-multiply filter blur-3xl opacity-10 -translate-x-1/2 -translate-y-1/2 animate-pulse"></div>
             <div class="absolute bottom-0 right-0 w-64 h-64 bg-indigo-500 rounded-full mix-blend-multiply filter blur-3xl opacity-10 translate-x-1/2 translate-y-1/2"></div>
 
@@ -42,7 +40,7 @@
                 <p class="text-sm text-gold font-bold mt-2 uppercase tracking-[0.2em]">NextGen Education Portal</p>
             </div>
 
-            <div class="relative z-10 space-y-6">
+            <div class="relative z-10 space-y-6 hidden md:block">
                 <div class="flex items-start space-x-4">
                     <div class="p-2 bg-white/10 rounded-lg backdrop-blur-sm">
                         <i data-lucide="brain-circuit" class="w-6 h-6 text-gold"></i>
@@ -63,36 +61,35 @@
                 </div>
             </div>
 
-            <div class="relative z-10 text-xs text-slate-500">
+            <div class="relative z-10 text-xs text-slate-500 mt-8 md:mt-0">
                 &copy; 2025 Shri Vaishnav Vidyapeeth Vishwavidyalaya
             </div>
         </div>
 
-        <!-- RIGHT SIDE: LOGIN FORM -->
-        <div class="md:w-1/2 p-12 flex flex-col justify-center bg-white relative">
+        <div class="md:w-1/2 p-8 md:p-12 flex flex-col justify-center bg-white relative">
             
-            <div class="text-center mb-8">
-                <h2 class="text-3xl font-bold text-slate-800" id="login-title">Welcome Back</h2>
-                <p class="text-slate-500 mt-2">Please sign in to continue</p>
+            <div class="text-center mb-6">
+                <img src="https://www.svvv.edu.in/assets/images/small-logo-png.png" alt="SVVV Logo" class="h-20 mx-auto mb-6">
+                
+                <h2 class="text-2xl md:text-3xl font-bold text-slate-800" id="login-title">Welcome Back</h2>
+                <p class="text-slate-500 mt-2 text-sm">Please sign in to continue</p>
             </div>
 
-            <!-- Role Toggle -->
-            <div class="bg-slate-100 p-1 rounded-xl flex mb-8 relative">
-                <!-- Sliding Background -->
+            <div class="bg-slate-100 p-1 rounded-xl flex mb-6 relative">
                 <div id="toggle-bg" class="absolute left-1 top-1 w-[calc(33.33%-4px)] h-[calc(100%-8px)] bg-white rounded-lg shadow-sm slide-toggle"></div>
                 
-                <button onclick="setRole('student')" class="flex-1 py-2.5 text-sm font-bold text-slate-700 z-10 relative transition-colors" id="btn-student">
+                <button onclick="setRole('student')" class="flex-1 py-2 text-xs md:text-sm font-bold text-slate-700 z-10 relative transition-colors" id="btn-student">
                     Student
                 </button>
-                <button onclick="setRole('teacher')" class="flex-1 py-2.5 text-sm font-bold text-slate-500 z-10 relative transition-colors" id="btn-teacher">
+                <button onclick="setRole('teacher')" class="flex-1 py-2 text-xs md:text-sm font-bold text-slate-500 z-10 relative transition-colors" id="btn-teacher">
                     Faculty
                 </button>
-                <button onclick="setRole('admin')" class="flex-1 py-2.5 text-sm font-bold text-slate-500 z-10 relative transition-colors" id="btn-admin">
+                <button onclick="setRole('admin')" class="flex-1 py-2 text-xs md:text-sm font-bold text-slate-500 z-10 relative transition-colors" id="btn-admin">
                     Admin
                 </button>
             </div>
 
-            <form onsubmit="handleLogin(event)" class="space-y-5">
+            <form onsubmit="handleLogin(event)" class="space-y-4">
                 <div>
                     <label class="block text-xs font-bold text-slate-500 uppercase mb-1" id="id-label">Enrollment No.</label>
                     <div class="relative">
@@ -122,7 +119,7 @@
                 </button>
             </form>
 
-            <p class="text-center mt-8 text-xs text-slate-400">
+            <p class="text-center mt-6 text-xs text-slate-400">
                 Access issues? <a href="#" class="text-navy font-bold hover:underline">Contact IT Support</a>
             </p>
         </div>
@@ -141,9 +138,9 @@
             const btnText = document.getElementById('btn-text');
 
             // Reset styles
-            btnStudent.className = "flex-1 py-2.5 text-sm font-bold text-slate-500 z-10 relative transition-colors";
-            btnTeacher.className = "flex-1 py-2.5 text-sm font-bold text-slate-500 z-10 relative transition-colors";
-            btnAdmin.className = "flex-1 py-2.5 text-sm font-bold text-slate-500 z-10 relative transition-colors";
+            btnStudent.className = "flex-1 py-2 md:py-2.5 text-xs md:text-sm font-bold text-slate-500 z-10 relative transition-colors";
+            btnTeacher.className = "flex-1 py-2 md:py-2.5 text-xs md:text-sm font-bold text-slate-500 z-10 relative transition-colors";
+            btnAdmin.className = "flex-1 py-2 md:py-2.5 text-xs md:text-sm font-bold text-slate-500 z-10 relative transition-colors";
 
             if (role === 'student') {
                 toggleBg.style.transform = 'translateX(0)';
