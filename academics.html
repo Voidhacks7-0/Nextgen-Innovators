@@ -2,18 +2,21 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SVVV | Academics</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --navy-dark: #0f2c4e; --accent-yellow: #fbbf24;
-            --bg-body: #f8fafc; --bg-surface: #ffffff; --text-main: #1e293b; --text-muted: #64748b; --border: #e2e8f0; --sidebar-width: 260px;
+            --navy-dark: #0f2c4e; --navy-light: #1e3a8a; --accent-yellow: #fbbf24;
+            --bg-body: #f8fafc; --bg-surface: #ffffff; --text-main: #1e293b; --text-muted: #64748b;
+            --border: #e2e8f0; --sidebar-width: 260px; --shadow: 0 4px 20px rgba(0,0,0,0.05);
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg-body); color: var(--text-main); display: flex; min-height: 100vh; }
         
-        .sidebar { width: var(--sidebar-width); background: var(--navy-dark); color: white; position: fixed; height: 100vh; display: flex; flex-direction: column; z-index: 100; }
+        /* Sidebar */
+        .sidebar { width: var(--sidebar-width); background: var(--navy-dark); color: white; position: fixed; height: 100vh; display: flex; flex-direction: column; z-index: 100; transition: 0.3s; }
         .logo-area { padding: 2rem; border-bottom: 1px solid rgba(255,255,255,0.1); }
         .logo-text { font-size: 2rem; font-weight: 800; letter-spacing: -1px; color: #fff; }
         .logo-sub { font-size: 0.75rem; color: var(--accent-yellow); text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
@@ -21,13 +24,17 @@
         .nav-link { display: flex; align-items: center; padding: 1rem; color: rgba(255,255,255,0.7); text-decoration: none; border-radius: 8px; margin-bottom: 0.5rem; font-weight: 500; transition: 0.2s; }
         .nav-link:hover { color: #fff; background: rgba(255,255,255,0.05); }
         .nav-link.active { background: var(--accent-yellow); color: var(--navy-dark); font-weight: 700; box-shadow: 0 4px 12px rgba(251, 191, 36, 0.3); }
-        .nav-link i { width: 24px; margin-right: 12px; }
+        .nav-link i { width: 24px; margin-right: 12px; font-size: 1.1rem; }
 
-        .main { margin-left: var(--sidebar-width); flex: 1; padding: 2.5rem; }
+        /* Main Content */
+        .main { margin-left: var(--sidebar-width); flex: 1; padding: 2.5rem; position: relative; }
         
+        .header h1 { font-size: 2rem; font-weight: 800; color: var(--navy-dark); margin-bottom: 0.5rem; }
+        .header p { color: var(--text-muted); margin-bottom: 2rem; }
+
         /* Tabs */
-        .tabs { display: flex; gap: 2rem; border-bottom: 2px solid #e2e8f0; margin-bottom: 2rem; }
-        .tab-btn { background: none; border: none; padding: 1rem 0; font-family: inherit; font-size: 1.1rem; font-weight: 600; color: var(--text-muted); cursor: pointer; position: relative; transition: 0.3s; }
+        .tabs { display: flex; gap: 1.5rem; border-bottom: 2px solid #e2e8f0; margin-bottom: 2rem; }
+        .tab-btn { background: none; border: none; padding: 1rem 0.5rem; font-family: inherit; font-size: 1rem; font-weight: 600; color: var(--text-muted); cursor: pointer; position: relative; transition: 0.3s; }
         .tab-btn:hover { color: var(--navy-dark); }
         .tab-btn.active { color: var(--navy-dark); }
         .tab-btn.active::after { content: ''; position: absolute; bottom: -2px; left: 0; width: 100%; height: 3px; background: var(--accent-yellow); }
@@ -37,24 +44,55 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
         /* Course Grid */
-        .courses-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; }
-        .course-card { background: #fff; border: 1px solid var(--border); border-radius: 12px; padding: 2rem; border-top: 5px solid var(--navy-dark); box-shadow: 0 4px 10px rgba(0,0,0,0.03); transition: 0.3s; }
+        .courses-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; }
+        .course-card { background: #fff; border: 1px solid var(--border); border-radius: 12px; padding: 2rem; border-top: 5px solid var(--navy-dark); box-shadow: var(--shadow); transition: 0.3s; position: relative; overflow: hidden; cursor: pointer; }
         .course-card:hover { transform: translateY(-5px); border-top-color: var(--accent-yellow); box-shadow: 0 15px 30px rgba(0,0,0,0.08); }
         
-        /* Accordion */
+        .progress-bar { background: #f1f5f9; height: 8px; border-radius: 4px; margin-top: 15px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--navy-dark); border-radius: 4px; transition: width 1s ease-in-out; }
+        .course-meta { display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--text-muted); margin-top: 5px; }
+
+        /* Syllabus Accordion */
+        .syllabus-wrapper { display: grid; grid-template-columns: 250px 1fr; gap: 2rem; }
+        .sem-selector { display: flex; flex-direction: column; gap: 0.5rem; }
+        .sem-btn { text-align: left; padding: 1rem; background: #fff; border: 1px solid var(--border); border-radius: 8px; cursor: pointer; font-weight: 600; color: var(--text-muted); transition: 0.2s; }
+        .sem-btn:hover { background: #f8fafc; }
+        .sem-btn.active { background: var(--navy-dark); color: white; border-color: var(--navy-dark); box-shadow: var(--shadow); }
+        
         .accordion-item { border: 1px solid var(--border); border-radius: 8px; margin-bottom: 10px; background: #fff; overflow: hidden; }
-        .accordion-header { padding: 1.2rem; cursor: pointer; font-weight: 700; color: var(--navy-dark); display: flex; justify-content: space-between; align-items: center; transition: 0.2s; }
+        .accordion-header { padding: 1.2rem; cursor: pointer; font-weight: 700; color: var(--navy-dark); display: flex; justify-content: space-between; align-items: center; transition: 0.2s; background: #fff; }
         .accordion-header:hover { background: #f8fafc; }
-        .accordion-header.open { background: var(--navy-dark); color: white; }
-        .accordion-body { padding: 0 1.2rem; max-height: 0; overflow: hidden; transition: 0.3s ease; background: #f8fafc; }
-        .accordion-body.open { padding: 1.2rem; max-height: 200px; }
+        .accordion-header.open { background: #f1f5f9; color: var(--navy-dark); border-bottom: 1px solid var(--border); }
+        .accordion-body { padding: 0 1.5rem; max-height: 0; overflow: hidden; transition: 0.3s ease; background: #fff; }
+        .accordion-body.open { padding: 1.5rem; max-height: 500px; }
+        
+        .unit-list { list-style: none; padding: 0; margin: 0; }
+        .unit-list li { margin-bottom: 0.8rem; padding-left: 1.5rem; position: relative; font-size: 0.95rem; color: var(--text-main); }
+        .unit-list li::before { content: "\f058"; font-family: "Font Awesome 6 Free"; font-weight: 900; color: var(--accent-yellow); position: absolute; left: 0; top: 2px; }
 
-        /* Faculty */
-        .faculty-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; }
-        .faculty-card { background: #fff; padding: 2rem; border-radius: 12px; border: 1px solid var(--border); text-align: center; }
-        .faculty-img { width: 80px; height: 80px; border-radius: 50%; background: #e2e8f0; margin: 0 auto 1rem; border: 3px solid var(--navy-dark); object-fit: cover; }
+        /* Faculty Grid */
+        .faculty-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem; }
+        .faculty-card { background: #fff; padding: 2rem; border-radius: 12px; border: 1px solid var(--border); text-align: center; transition: 0.3s; position: relative; }
+        .faculty-card:hover { transform: translateY(-5px); box-shadow: var(--shadow); border-color: var(--accent-yellow); }
+        .faculty-img { width: 100px; height: 100px; border-radius: 50%; background: #e2e8f0; margin: 0 auto 1rem; border: 4px solid var(--navy-dark); object-fit: cover; }
+        .btn-contact { margin-top: 1rem; padding: 8px 16px; background: #f8fafc; border: 1px solid var(--border); border-radius: 6px; color: var(--navy-dark); font-weight: 600; cursor: pointer; transition: 0.2s; font-size: 0.9rem; width: 100%; }
+        .btn-contact:hover { background: var(--navy-dark); color: white; border-color: var(--navy-dark); }
 
-        @media (max-width: 768px) { .sidebar { display: none; } .main { margin-left: 0; padding: 1rem; } }
+        /* Resources Table */
+        .res-table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 12px; overflow: hidden; box-shadow: var(--shadow); }
+        .res-table th { background: var(--navy-dark); color: white; padding: 1rem; text-align: left; font-weight: 600; }
+        .res-table td { padding: 1rem; border-bottom: 1px solid var(--border); color: var(--text-main); }
+        .res-table tr:last-child td { border-bottom: none; }
+        .file-icon { color: #ef4444; margin-right: 8px; font-size: 1.1rem; }
+        .btn-download { color: var(--navy-dark); font-weight: 700; text-decoration: none; display: flex; align-items: center; gap: 5px; cursor: pointer; transition: 0.2s; }
+        .btn-download:hover { color: var(--accent-yellow); }
+
+        /* Toast */
+        .toast { position: fixed; bottom: 30px; right: 30px; background: var(--navy-dark); color: var(--accent-yellow); padding: 1rem 2rem; border-radius: 8px; font-weight: 600; transform: translateY(100px); transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 2000; box-shadow: 0 10px 20px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 10px; }
+        .toast.show { transform: translateY(0); }
+
+        @media (max-width: 1024px) { .syllabus-wrapper { grid-template-columns: 1fr; } }
+        @media (max-width: 768px) { .sidebar { display: none; } .main { margin-left: 0; padding: 1rem; } .header { text-align: center; } }
     </style>
 </head>
 <body>
@@ -65,70 +103,167 @@
             <li><a href="schedule.html" class="nav-link"><i class="far fa-calendar-alt"></i> Schedule</a></li>
             <li><a href="resources.html" class="nav-link"><i class="fas fa-layer-group"></i> Resources</a></li>
             <li><a href="academics.html" class="nav-link active"><i class="fas fa-graduation-cap"></i> Academics</a></li>
-            <li><a href="test.html" class="nav-link"><i class="fas fa-users"></i> Placement </li>a></li>
+            <li><a href="http://localhost:5173/placement" class="nav-link"><i class="fas fa-briefcase"></i> Placement Cell</a></li>
             <li><a href="collaboration.html" class="nav-link"><i class="fas fa-users"></i> Collaboration</a></li>
         </ul>
     </nav>
+
     <main class="main">
-        <h1 style="font-size: 2.5rem; font-weight: 800; color: var(--navy-dark); margin-bottom: 2rem;">Academics</h1>
+        <div class="header">
+            <h1>Academic Portal</h1>
+            <p>Manage your courses, track syllabus progress, and connect with faculty.</p>
+        </div>
         
         <div class="tabs">
             <button class="tab-btn active" onclick="switchTab('courses')">My Courses</button>
             <button class="tab-btn" onclick="switchTab('syllabus')">Syllabus</button>
-            <button class="tab-btn" onclick="switchTab('faculty')">Faculty</button>
+            <button class="tab-btn" onclick="switchTab('resources')">Materials</button>
+            <button class="tab-btn" onclick="switchTab('faculty')">Faculty Directory</button>
         </div>
 
         <div id="courses" class="content-section active">
             <div class="courses-grid">
-                <div class="course-card">
-                    <h3 style="color:var(--navy-dark); margin-bottom:0.5rem;">Data Structures</h3>
-                    <p style="color:var(--text-muted);">Fundamental data organization.</p>
+                <div class="course-card" onclick="showToast('Opening Course: Data Structures...')">
+                    <div style="display:flex; justify-content:space-between;">
+                        <h3 style="color:var(--navy-dark); margin-bottom:0.5rem;">Data Structures</h3>
+                        <span style="font-size:0.8rem; background:#dcfce7; color:#166534; padding:2px 8px; border-radius:4px; height:fit-content; font-weight:700;">Ongoing</span>
+                    </div>
+                    <p style="color:var(--text-muted); font-size:0.9rem;">CS-301 • 4 Credits</p>
+                    <div class="progress-bar"><div class="progress-fill" style="width: 75%;"></div></div>
+                    <div class="course-meta"><span>75% Completed</span><span>Next: Trees & Graphs</span></div>
                 </div>
-                <div class="course-card">
-                    <h3 style="color:var(--navy-dark); margin-bottom:0.5rem;">Operating Systems</h3>
-                    <p style="color:var(--text-muted);">Process and memory management.</p>
+
+                <div class="course-card" onclick="showToast('Opening Course: Operating Systems...')">
+                    <div style="display:flex; justify-content:space-between;">
+                        <h3 style="color:var(--navy-dark); margin-bottom:0.5rem;">Operating Systems</h3>
+                        <span style="font-size:0.8rem; background:#dcfce7; color:#166534; padding:2px 8px; border-radius:4px; height:fit-content; font-weight:700;">Ongoing</span>
+                    </div>
+                    <p style="color:var(--text-muted); font-size:0.9rem;">CS-302 • 3 Credits</p>
+                    <div class="progress-bar"><div class="progress-fill" style="width: 45%;"></div></div>
+                    <div class="course-meta"><span>45% Completed</span><span>Next: CPU Scheduling</span></div>
                 </div>
-                <div class="course-card">
-                    <h3 style="color:var(--navy-dark); margin-bottom:0.5rem;">Database Systems</h3>
-                    <p style="color:var(--text-muted);">SQL and relational theory.</p>
+
+                <div class="course-card" onclick="showToast('Opening Course: Database Systems...')">
+                    <div style="display:flex; justify-content:space-between;">
+                        <h3 style="color:var(--navy-dark); margin-bottom:0.5rem;">Database Systems</h3>
+                        <span style="font-size:0.8rem; background:#fff7ed; color:#9a3412; padding:2px 8px; border-radius:4px; height:fit-content; font-weight:700;">Pending Lab</span>
+                    </div>
+                    <p style="color:var(--text-muted); font-size:0.9rem;">CS-303 • 4 Credits</p>
+                    <div class="progress-bar"><div class="progress-fill" style="width: 60%;"></div></div>
+                    <div class="course-meta"><span>60% Completed</span><span>Next: Normalization</span></div>
                 </div>
             </div>
         </div>
 
         <div id="syllabus" class="content-section">
-            <div class="accordion-item">
-                <div class="accordion-header" onclick="toggleAcc(this)">Semester 1 <i class="fas fa-chevron-down"></i></div>
-                <div class="accordion-body">
-                    <p>• Intro to Programming</p>
-                    <p>• Engineering Maths I</p>
-                    <p>• Physics</p>
+            <div class="syllabus-wrapper">
+                <div class="sem-selector">
+                    <button class="sem-btn active" onclick="changeSem(this, 'Semester 5')">Semester 5 (Current)</button>
+                    <button class="sem-btn" onclick="changeSem(this, 'Semester 4')">Semester 4</button>
+                    <button class="sem-btn" onclick="changeSem(this, 'Semester 3')">Semester 3</button>
+                </div>
+                
+                <div class="syllabus-content">
+                    <h3 style="color:var(--navy-dark); margin-bottom: 1rem;" id="semTitle">Semester 5 Syllabus</h3>
+                    <div class="accordion-item">
+                        <div class="accordion-header" onclick="toggleAcc(this)">
+                            Data Structures & Algorithms <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="accordion-body">
+                            <ul class="unit-list">
+                                <li>Unit 1: Introduction to Algorithms & Complexity Analysis</li>
+                                <li>Unit 2: Linear Data Structures (Stacks, Queues, Linked Lists)</li>
+                                <li>Unit 3: Non-Linear Data Structures (Trees, Graphs)</li>
+                                <li>Unit 4: Sorting & Searching Techniques</li>
+                                <li>Unit 5: Hashing & File Structures</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <div class="accordion-header" onclick="toggleAcc(this)">
+                            Operating Systems <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="accordion-body">
+                            <ul class="unit-list">
+                                <li>Unit 1: Introduction & System Structures</li>
+                                <li>Unit 2: Process Management & Threads</li>
+                                <li>Unit 3: CPU Scheduling & Deadlocks</li>
+                                <li>Unit 4: Memory Management (Paging, Segmentation)</li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="accordion-item">
-                <div class="accordion-header" onclick="toggleAcc(this)">Semester 2 <i class="fas fa-chevron-down"></i></div>
-                <div class="accordion-body">
-                    <p>• Data Structures</p>
-                    <p>• Digital Logic Design</p>
-                    <p>• Discrete Mathematics</p>
-                </div>
+        </div>
+
+        <div id="resources" class="content-section">
+            <div class="bg-white p-6 rounded-xl border border-slate-200">
+                <table class="res-table">
+                    <thead>
+                        <tr>
+                            <th>Subject</th>
+                            <th>Title</th>
+                            <th>Date Uploaded</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Data Structures</td>
+                            <td><i class="fas fa-file-pdf file-icon"></i> Unit 3 - Trees Notes</td>
+                            <td>Nov 20, 2025</td>
+                            <td><span class="btn-download" onclick="downloadFile('Trees Notes.pdf')">Download <i class="fas fa-download"></i></span></td>
+                        </tr>
+                        <tr>
+                            <td>Operating Sys</td>
+                            <td><i class="fas fa-file-powerpoint file-icon" style="color:#ea580c"></i> Process Scheduling PPT</td>
+                            <td>Nov 18, 2025</td>
+                            <td><span class="btn-download" onclick="downloadFile('OS_Scheduling.pptx')">Download <i class="fas fa-download"></i></span></td>
+                        </tr>
+                        <tr>
+                            <td>Database Mgmt</td>
+                            <td><i class="fas fa-file-code file-icon" style="color:#2563eb"></i> SQL Lab Assignment 4</td>
+                            <td>Nov 15, 2025</td>
+                            <td><span class="btn-download" onclick="downloadFile('SQL_Assignment_4.zip')">Download <i class="fas fa-download"></i></span></td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
 
         <div id="faculty" class="content-section">
             <div class="faculty-grid">
                 <div class="faculty-card">
-                    <img src="https://randomuser.me/api/portraits/women/44.jpg" class="faculty-img">
-                    <h4 style="color:var(--navy-dark);">Dr. Alice Smith</h4>
-                    <p style="color:var(--text-muted); font-size:0.9rem;">Data Structures</p>
+                    <img src="https://randomuser.me/api/portraits/men/81.jpg" class="faculty-img" alt="Vikram Kapoor">
+                    <h3 style="color:var(--navy-dark); font-size:1.2rem; margin-bottom:5px;">Prof. Vikram Kapoor</h3>
+                    <p style="color:var(--accent-yellow); font-weight:700; font-size:0.8rem; text-transform:uppercase; margin-bottom:10px;">HOD - CSE</p>
+                    <p style="color:var(--text-muted); font-size:0.9rem;">Specialization: AI, Cloud Computing</p>
+                    <button class="btn-contact" onclick="sendEmail('vkapoor')"><i class="far fa-envelope"></i> Email</button>
                 </div>
+
                 <div class="faculty-card">
-                    <img src="https://randomuser.me/api/portraits/men/32.jpg" class="faculty-img">
-                    <h4 style="color:var(--navy-dark);">Prof. Bob Johnson</h4>
-                    <p style="color:var(--text-muted); font-size:0.9rem;">Operating Systems</p>
+                    <img src="https://randomuser.me/api/portraits/women/32.jpg" class="faculty-img" alt="Anjali Sharma">
+                    <h3 style="color:var(--navy-dark); font-size:1.2rem; margin-bottom:5px;">Dr. Anjali Sharma</h3>
+                    <p style="color:var(--accent-yellow); font-weight:700; font-size:0.8rem; text-transform:uppercase; margin-bottom:10px;">Assoc. Professor</p>
+                    <p style="color:var(--text-muted); font-size:0.9rem;">Specialization: Data Structures, Algorithms</p>
+                    <button class="btn-contact" onclick="sendEmail('asharma')"><i class="far fa-envelope"></i> Email</button>
+                </div>
+
+                <div class="faculty-card">
+                    <img src="https://randomuser.me/api/portraits/men/34.jpg" class="faculty-img" alt="Rohan Mehta">
+                    <h3 style="color:var(--navy-dark); font-size:1.2rem; margin-bottom:5px;">Mr. Rohan Mehta</h3>
+                    <p style="color:var(--accent-yellow); font-weight:700; font-size:0.8rem; text-transform:uppercase; margin-bottom:10px;">Asst. Professor</p>
+                    <p style="color:var(--text-muted); font-size:0.9rem;">Specialization: DBMS, Big Data</p>
+                    <button class="btn-contact" onclick="sendEmail('rmehta')"><i class="far fa-envelope"></i> Email</button>
                 </div>
             </div>
         </div>
     </main>
+
+    <div class="toast" id="toast">
+        <i class="fas fa-check-circle"></i> <span>Action Successful!</span>
+    </div>
 
     <script>
         function switchTab(id) {
@@ -141,6 +276,50 @@
         function toggleAcc(el) {
             el.classList.toggle('open');
             el.nextElementSibling.classList.toggle('open');
+            const icon = el.querySelector('i');
+            if(el.classList.contains('open')) icon.style.transform = 'rotate(180deg)';
+            else icon.style.transform = 'rotate(0deg)';
+        }
+
+        // --- Interaction Logic ---
+
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.querySelector('span').innerText = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 3000);
+        }
+
+        function sendEmail(user) {
+            const email = user + "@svvv.edu.in";
+            showToast("Opening mail for " + email);
+            window.location.href = "mailto:" + email;
+        }
+
+        function downloadFile(filename) {
+            showToast("Downloading " + filename + "...");
+            // Simulate download delay
+            setTimeout(() => {
+                // In a real app, this would trigger a file fetch
+                console.log("Download started for: " + filename);
+            }, 1000);
+        }
+
+        function changeSem(btn, semesterName) {
+            // Remove active class from all buttons
+            document.querySelectorAll('.sem-btn').forEach(b => b.classList.remove('active'));
+            // Add active class to clicked button
+            btn.classList.add('active');
+            
+            // Update Title
+            document.getElementById('semTitle').innerText = semesterName + " Syllabus";
+            
+            // Simulate reloading data (Visual Feedback)
+            const content = document.querySelector('.syllabus-content');
+            content.style.opacity = '0.5';
+            setTimeout(() => content.style.opacity = '1', 300);
+            
+            showToast("Loaded " + semesterName + " data");
         }
     </script>
 </body>
