@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SVVV Faculty Portal | Smart Dashboard</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        /* Animations */
+        .fade-in { animation: fadeIn 0.5s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .pulse-ring {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 2px solid #fbbf24;
+            animation: pulse-ring 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+        }
+        @keyframes pulse-ring { 0% { transform: scale(0.8); opacity: 1; } 100% { transform: scale(2); opacity: 0; } }
+
+        /* Toast Notification */
+        #toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+        .toast {
+            background: #1e293b;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            margin-top: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            animation: slideInRight 0.3s ease-out forwards;
+        }
+        .toast.success { border-left: 4px solid #22c55e; }
+        .toast.info { border-left: 4px solid #3b82f6; }
+        
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes fadeOut {
+            to { opacity: 0; transform: translateY(10px); }
+        }
+    </style>
+</head>
+<body class="text-slate-900">
+
+    <!-- Toast Container -->
+    <div id="toast-container"></div>
+
+    <!-- SIDEBAR -->
+    <div class="fixed left-0 top-0 w-72 h-screen bg-[#0f172a] text-white flex flex-col z-50 transition-all duration-300 border-r border-slate-800 shadow-2xl">
+        <div class="p-8 pb-8">
+            <h1 class="text-4xl font-extrabold tracking-tight text-white leading-none">SVVV</h1>
+            <p class="text-xs text-[#fbbf24] font-bold mt-1.5 uppercase tracking-[0.15em]">Faculty Portal</p>
+        </div>
+
+        <nav class="flex-1 space-y-2 py-2">
+            <a href="#" onclick="switchView('dashboard')" id="nav-dashboard" class="nav-item active flex items-center px-6 py-3.5 mx-4 bg-[#fbbf24] text-slate-900 rounded-xl shadow-[0_4px_14px_0_rgba(251,191,36,0.3)] font-bold transition-all duration-200 transform scale-[1.02]">
+                <i data-lucide="layout-grid" class="mr-4 w-5 h-5 stroke-[2.5]"></i>
+                <span class="font-bold text-[16px] tracking-tight">Overview</span>
+            </a>
+            <a href="#" onclick="switchView('analytics')" id="nav-analytics" class="nav-item flex items-center px-6 py-3.5 mx-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl transition-all duration-200 group">
+                <i data-lucide="bar-chart-2" class="mr-4 w-5 h-5 stroke-[2] opacity-80 group-hover:opacity-100 transition-opacity"></i>
+                <span class="font-medium text-[16px] tracking-tight">Batch Analytics</span>
+            </a>
+            <a href="#" onclick="switchView('mentorship')" id="nav-mentorship" class="nav-item flex items-center px-6 py-3.5 mx-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl transition-all duration-200 group">
+                <i data-lucide="users" class="mr-4 w-5 h-5 stroke-[2] opacity-80 group-hover:opacity-100 transition-opacity"></i>
+                <span class="font-medium text-[16px] tracking-tight">Mentorship</span>
+            </a>
+            <a href="#" onclick="switchView('assignments')" id="nav-assignments" class="nav-item flex items-center px-6 py-3.5 mx-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl transition-all duration-200 group">
+                <i data-lucide="check-square" class="mr-4 w-5 h-5 stroke-[2] opacity-80 group-hover:opacity-100 transition-opacity"></i>
+                <span class="font-medium text-[16px] tracking-tight">Assignments</span>
+            </a>
+            <a href="#" onclick="switchView('office')" id="nav-office" class="nav-item flex items-center px-6 py-3.5 mx-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl transition-all duration-200 group">
+                <i data-lucide="message-circle" class="mr-4 w-5 h-5 stroke-[2] opacity-80 group-hover:opacity-100 transition-opacity"></i>
+                <span class="font-medium text-[16px] tracking-tight">Office Hours</span>
+            </a>
+        </nav>
+
+        <div class="p-8 border-t border-slate-800">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center font-bold text-[#fbbf24]">VK</div>
+                <div>
+                    <p class="text-sm font-bold text-white">Prof. Vikram</p>
+                    <p class="text-xs text-slate-400">CS Dept. Head</p>
+                </div>
+            </div>
+            <button onclick="logout()" class="flex items-center text-slate-400 hover:text-white text-sm font-medium transition-colors">
+                <i data-lucide="log-out" class="mr-3 w-4 h-4 stroke-[2]"></i>
+                Logout
+            </button>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="ml-72 min-h-screen flex flex-col">
+        
+        <!-- HEADER -->
+        <header class="h-20 bg-white border-b border-slate-200 flex items-center justify-between px-8 sticky top-0 z-40 shadow-sm">
+            <div>
+                <h2 class="text-2xl font-bold text-slate-800" id="page-title">Faculty Dashboard</h2>
+                <p class="text-sm text-slate-500" id="page-subtitle">Welcome back, Professor. You have 3 pending reviews.</p>
+            </div>
+            <div class="flex items-center space-x-4">
+                <button onclick="switchView('assignments')" class="flex items-center bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-lg text-sm font-medium transition">
+                    <i data-lucide="plus" class="w-4 h-4 mr-2"></i> New Assignment
+                </button>
+                <div class="h-8 w-px bg-slate-300 mx-2"></div>
+                <button class="relative p-2 text-slate-500 hover:text-slate-700 transition-colors">
+                    <i data-lucide="bell" class="w-5 h-5"></i>
+                    <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+                </button>
+            </div>
+        </header>
+
+        <!-- CONTENT AREA -->
+        <main id="app-content" class="p-8 flex-1 relative overflow-hidden">
+            <!-- Injected via JS -->
+        </main>
+
+    </div>
+
+    <!-- JAVASCRIPT -->
+    <script>
+        // --- DATA SIMULATION ---
+        const studentStats = {
+            total: 120,
+            placed: 45,
+            atRisk: 12,
+            avgScore: 78
+        };
+
+        const atRiskStudents = [
+            { id: 1, name: "Rohan Das", issue: "Failed Graph Theory Test", trend: "down" },
+            { id: 2, name: "Priya Sharma", issue: "Low Attendance (65%)", trend: "flat" },
+            { id: 3, name: "Amitesh Paliwal", issue: "Weak in Dynamic Programming", trend: "up" }
+        ];
+
+        const assignments = [
+            { id: 101, title: "Advanced Graph Algorithms", due: "Nov 30", submissions: "45/120" },
+            { id: 102, title: "System Design Mock", due: "Dec 05", submissions: "12/120" }
+        ];
+
+        // --- UTILS ---
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `<span>${message}</span>`;
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.animation = 'fadeOut 0.3s forwards';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+        function logout() {
+            showToast("Logging out...", "info");
+            setTimeout(() => {
+                // Redirect to login page
+                window.location.href = 'login.html';
+            }, 1000);
+        }
+        // --- RENDER FUNCTIONS ---
+
+        function updateSidebar(activeId) {
+            document.querySelectorAll('.nav-item').forEach(el => {
+                el.className = 'nav-item flex items-center px-6 py-3.5 mx-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl transition-all duration-200 group';
+            });
+            const activeEl = document.getElementById(activeId);
+            if(activeEl) {
+                activeEl.className = 'nav-item active flex items-center px-6 py-3.5 mx-4 bg-[#fbbf24] text-slate-900 rounded-xl shadow-[0_4px_14px_0_rgba(251,191,36,0.3)] font-bold transition-all duration-200 transform scale-[1.02]';
+            }
+        }
+
+        function switchView(view) {
+            // Update Sidebar UI
+            updateSidebar(`nav-${view}`);
+
+            // Render Content
+            if (view === 'dashboard') renderDashboard();
+            else if (view === 'analytics') renderAnalytics();
+            else if (view === 'mentorship') renderMentorship();
+            else if (view === 'assignments') renderAssignments();
+            else if (view === 'office') renderOfficeHours();
+        }
+
+        // 1. DASHBOARD VIEW
+        function renderDashboard() {
+            document.getElementById('page-title').innerText = "Faculty Dashboard";
+            const appContent = document.getElementById('app-content');
+            
+            appContent.innerHTML = `
+                <div class="space-y-8 fade-in">
+                    
+                    <!-- 1. AI Pulse Check (New Gen Feature) -->
+                    <div class="bg-gradient-to-r from-indigo-600 to-violet-600 rounded-2xl p-6 text-white shadow-lg relative overflow-hidden">
+                        <div class="absolute right-0 top-0 opacity-10"><i data-lucide="cpu" class="w-64 h-64 transform translate-x-10 -translate-y-10"></i></div>
+                        <div class="relative z-10">
+                            <div class="flex items-center mb-4">
+                                <div class="relative">
+                                    <div class="pulse-ring"></div>
+                                    <i data-lucide="sparkles" class="w-6 h-6 text-[#fbbf24] relative z-10"></i>
+                                </div>
+                                <span class="ml-3 font-bold uppercase tracking-wider text-sm text-indigo-200">AI Class Pulse • Live</span>
+                            </div>
+                            <h2 class="text-2xl font-bold mb-2">Attention Needed: Dynamic Programming</h2>
+                            <p class="text-indigo-100 max-w-2xl mb-6 text-lg">
+                                My analysis of yesterday's mock test shows <strong>42% of students</strong> struggled with 'Knapsack Problems'. The logic logic score dropped by 15% compared to last week.
+                            </p>
+                            <div class="flex space-x-3">
+                                <button onclick="autoAssignTasks()" class="bg-[#fbbf24] text-slate-900 px-5 py-2.5 rounded-lg font-bold hover:bg-amber-400 transition shadow-lg flex items-center">
+                                    <i data-lucide="send" class="w-4 h-4 mr-2"></i>
+                                    Auto-Assign Remedial Tasks
+                                </button>
+                                <button onclick="switchView('analytics')" class="bg-white/10 hover:bg-white/20 text-white px-5 py-2.5 rounded-lg font-medium transition backdrop-blur-sm">
+                                    View Struggling Students
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2. Quick Stats Row -->
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                            <p class="text-slate-500 text-sm font-medium">Total Students</p>
+                            <h3 class="text-3xl font-bold text-slate-800 mt-1">${studentStats.total}</h3>
+                            <span class="text-green-600 text-xs font-bold bg-green-50 px-2 py-1 rounded mt-2 inline-block">+5 New</span>
+                        </div>
+                        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                            <p class="text-slate-500 text-sm font-medium">Avg. Placement Score</p>
+                            <h3 class="text-3xl font-bold text-slate-800 mt-1">${studentStats.avgScore}%</h3>
+                            <span class="text-green-600 text-xs font-bold bg-green-50 px-2 py-1 rounded mt-2 inline-block">On Track</span>
+                        </div>
+                        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                            <p class="text-slate-500 text-sm font-medium">At-Risk Students</p>
+                            <h3 class="text-3xl font-bold text-red-600 mt-1">${studentStats.atRisk}</h3>
+                            <span class="text-red-600 text-xs font-bold bg-red-50 px-2 py-1 rounded mt-2 inline-block">Needs Action</span>
+                        </div>
+                        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                            <p class="text-slate-500 text-sm font-medium">Upcoming Interviews</p>
+                            <h3 class="text-3xl font-bold text-slate-800 mt-1">8</h3>
+                            <span class="text-blue-600 text-xs font-bold bg-blue-50 px-2 py-1 rounded mt-2 inline-block">Google, TCS</span>
+                        </div>
+                    </div>
+
+                    <!-- 3. Split View: At Risk Table & Live Queue -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        
+                        <!-- At Risk Students Table -->
+                        <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                            <div class="p-6 border-b border-slate-100 flex justify-between items-center">
+                                <h3 class="font-bold text-slate-800 text-lg">Focus Group (At-Risk)</h3>
+                                <button onclick="switchView('analytics')" class="text-blue-600 text-sm font-medium hover:underline">View All</button>
+                            </div>
+                            <table class="w-full text-left">
+                                <thead class="bg-slate-50 text-slate-500 text-xs uppercase font-semibold">
+                                    <tr>
+                                        <th class="p-4 pl-6">Student</th>
+                                        <th class="p-4">Key Issue</th>
+                                        <th class="p-4">Trend</th>
+                                        <th class="p-4 text-right pr-6">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-100">
+                                    ${atRiskStudents.map(s => `
+                                        <tr class="hover:bg-slate-50 transition">
+                                            <td class="p-4 pl-6 font-medium text-slate-800">${s.name}</td>
+                                            <td class="p-4 text-sm text-slate-600">${s.issue}</td>
+                                            <td class="p-4">
+                                                ${s.trend === 'up' 
+                                                    ? '<i data-lucide="trending-up" class="w-4 h-4 text-green-500"></i>' 
+                                                    : (s.trend === 'down' ? '<i data-lucide="trending-down" class="w-4 h-4 text-red-500"></i>' : '<i data-lucide="minus" class="w-4 h-4 text-slate-400"></i>')}
+                                            </td>
+                                            <td class="p-4 text-right pr-6">
+                                                <button id="nudge-${s.id}" onclick="nudgeStudent(${s.id}, '${s.name}')" class="text-xs bg-[#0f172a] text-white px-3 py-1.5 rounded hover:bg-slate-800 transition">Nudge</button>
+                                            </td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Live Doubt Queue (New Gen Feature) -->
+                        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 flex flex-col h-[400px]">
+                            <div class="p-6 border-b border-slate-100 bg-slate-50/50">
+                                <div class="flex justify-between items-center">
+                                    <h3 class="font-bold text-slate-800 text-lg flex items-center">
+                                        <i data-lucide="message-circle" class="w-5 h-5 mr-2 text-green-500"></i>
+                                        Live Doubt Queue
+                                    </h3>
+                                    <span class="bg-green-100 text-green-700 text-xs font-bold px-2 py-1 rounded animate-pulse">2 Waiting</span>
+                                </div>
+                            </div>
+                            <div class="p-4 space-y-4 flex-1 overflow-y-auto" id="doubt-queue">
+                                <div class="p-4 bg-white border border-slate-200 rounded-xl shadow-sm hover:border-[#fbbf24] transition cursor-pointer group" id="queue-item-1">
+                                    <div class="flex justify-between items-start mb-2">
+                                        <span class="font-bold text-slate-800 text-sm">Sneha G.</span>
+                                        <span class="text-xs text-slate-400">2m ago</span>
+                                    </div>
+                                    <p class="text-xs text-slate-600 line-clamp-2">"Sir, I'm getting TLE in the Graph DFS problem. Can you check my complexity?"</p>
+                                    <div class="mt-3 flex space-x-2">
+                                        <button onclick="acceptDoubt(1)" class="flex-1 bg-green-50 hover:bg-green-100 text-green-700 text-xs font-bold py-1.5 rounded transition">Accept</button>
+                                        <button onclick="deferDoubt(1)" class="flex-1 bg-slate-50 hover:bg-slate-100 text-slate-600 text-xs font-bold py-1.5 rounded transition">Defer</button>
+                                    </div>
+                                </div>
+                                <div class="p-4 bg-white border border-slate-200 rounded-xl shadow-sm hover:border-[#fbbf24] transition cursor-pointer group" id="queue-item-2">
+                                    <div class="flex justify-between items-start mb-2">
+                                        <span class="font-bold text-slate-800 text-sm">Rahul K.</span>
+                                        <span class="text-xs text-slate-400">5m ago</span>
+                                    </div>
+                                    <p class="text-xs text-slate-600 line-clamp-2">"Doubt regarding the Aptitude test Logic section Q.4"</p>
+                                    <div class="mt-3 flex space-x-2">
+                                        <button onclick="acceptDoubt(2)" class="flex-1 bg-green-50 hover:bg-green-100 text-green-700 text-xs font-bold py-1.5 rounded transition">Accept</button>
+                                        <button onclick="deferDoubt(2)" class="flex-1 bg-slate-50 hover:bg-slate-100 text-slate-600 text-xs font-bold py-1.5 rounded transition">Defer</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="p-4 border-t border-slate-100">
+                                <button onclick="switchView('office')" class="w-full py-2 border-2 border-dashed border-slate-300 text-slate-500 text-sm font-bold rounded-lg hover:border-slate-400 hover:text-slate-600 transition">
+                                    Go to Office Hours
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            `;
+            lucide.createIcons();
+        }
+
+        // 2. ANALYTICS VIEW
+        function renderAnalytics() {
+            document.getElementById('page-title').innerText = "Batch Analytics";
+            const appContent = document.getElementById('app-content');
+            appContent.innerHTML = `
+                <div class="fade-in">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                            <h3 class="font-bold text-slate-800 mb-6">Placement Probability Radar</h3>
+                            <div class="h-80 w-full">
+                                <canvas id="facultyRadar"></canvas>
+                            </div>
+                        </div>
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                            <h3 class="font-bold text-slate-800 mb-6">Weekly Improvement Trend</h3>
+                            <div class="h-80 w-full flex items-center justify-center text-slate-400 bg-slate-50 rounded-lg">
+                                <span class="text-sm">Chart Placeholder: Weekly growth graph goes here</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            lucide.createIcons();
+            
+            // Chart Logic
+            setTimeout(() => {
+                const ctx = document.getElementById('facultyRadar');
+                if(ctx) {
+                    new Chart(ctx, {
+                        type: 'radar',
+                        data: {
+                            labels: ['Coding', 'Aptitude', 'Communication', 'Projects', 'Core CS'],
+                            datasets: [{
+                                label: 'Batch Average',
+                                data: [75, 80, 65, 85, 70],
+                                fill: true,
+                                backgroundColor: 'rgba(251, 191, 36, 0.2)',
+                                borderColor: '#fbbf24',
+                                pointBackgroundColor: '#fbbf24'
+                            }, {
+                                label: 'Industry Standard',
+                                data: [80, 80, 80, 80, 80],
+                                fill: true,
+                                backgroundColor: 'rgba(15, 23, 42, 0.1)',
+                                borderColor: '#0f172a',
+                                pointBackgroundColor: '#0f172a'
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: { r: { suggestedMin: 0, suggestedMax: 100 } }
+                        }
+                    });
+                }
+            }, 100);
+        }
+
+        // 3. MENTORSHIP VIEW
+        function renderMentorship() {
+            document.getElementById('page-title').innerText = "Mentorship Program";
+            const appContent = document.getElementById('app-content');
+            appContent.innerHTML = `
+                <div class="fade-in space-y-6">
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="font-bold text-slate-800 text-lg">My Mentees (12)</h3>
+                            <button class="bg-[#0f172a] text-white px-4 py-2 rounded-lg text-sm hover:bg-slate-800">Schedule Batch Meeting</button>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            ${[1,2,3,4,5,6].map(i => `
+                                <div class="border border-slate-200 rounded-xl p-4 hover:border-[#fbbf24] transition group bg-slate-50/50">
+                                    <div class="flex items-center gap-4 mb-3">
+                                        <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center font-bold text-slate-600 shadow-sm border border-slate-100">S${i}</div>
+                                        <div>
+                                            <h4 class="font-bold text-slate-800">Student ${i}</h4>
+                                            <p class="text-xs text-slate-500">CS-A • Year 3</p>
+                                        </div>
+                                    </div>
+                                    <div class="h-1.5 w-full bg-slate-200 rounded-full mb-3 overflow-hidden">
+                                        <div class="h-full bg-green-500 w-[${60 + i*5}%]"></div>
+                                    </div>
+                                    <p class="text-xs text-slate-500 mb-4">Progress: ${60 + i*5}% on track</p>
+                                    <div class="flex gap-2">
+                                        <button class="flex-1 py-1.5 text-xs font-bold border border-slate-300 rounded hover:bg-slate-100">Profile</button>
+                                        <button class="flex-1 py-1.5 text-xs font-bold bg-[#fbbf24] text-slate-900 rounded hover:bg-amber-400">Message</button>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+            lucide.createIcons();
+        }
+
+        // 4. ASSIGNMENTS VIEW
+        function renderAssignments() {
+            document.getElementById('page-title').innerText = "Assignments Manager";
+            const appContent = document.getElementById('app-content');
+            appContent.innerHTML = `
+                <div class="fade-in grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <!-- Create New -->
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 h-fit">
+                        <h3 class="font-bold text-slate-800 mb-4">Create New Task</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Title</label>
+                                <input type="text" placeholder="e.g. Graph Theory Practice" class="w-full border border-slate-200 rounded-lg p-2.5 text-sm focus:outline-none focus:border-[#fbbf24]">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Type</label>
+                                <select class="w-full border border-slate-200 rounded-lg p-2.5 text-sm outline-none"><option>Coding Problem</option><option>Aptitude Quiz</option><option>Project</option></select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Assign To</label>
+                                <select class="w-full border border-slate-200 rounded-lg p-2.5 text-sm outline-none"><option>Entire Batch (CS-3)</option><option>At-Risk Students Only</option><option>Mentee Group</option></select>
+                            </div>
+                            <button onclick="showToast('Assignment Created Successfully!')" class="w-full bg-[#0f172a] text-white py-2.5 rounded-lg font-bold hover:bg-slate-800 transition">Publish Assignment</button>
+                        </div>
+                    </div>
+
+                    <!-- Active List -->
+                    <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                        <div class="p-6 border-b border-slate-100"><h3 class="font-bold text-slate-800">Active Assignments</h3></div>
+                        <div class="divide-y divide-slate-100">
+                            ${assignments.map(a => `
+                                <div class="p-5 flex items-center justify-between hover:bg-slate-50">
+                                    <div>
+                                        <h4 class="font-bold text-slate-800">${a.title}</h4>
+                                        <p class="text-sm text-slate-500">Due: ${a.due} • ${a.submissions} Submissions</p>
+                                    </div>
+                                    <div class="flex gap-3">
+                                        <button class="text-sm text-blue-600 font-medium hover:underline">View Submissions</button>
+                                        <button class="text-slate-400 hover:text-red-500"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+            lucide.createIcons();
+        }
+
+        // 5. OFFICE HOURS VIEW
+        function renderOfficeHours() {
+            document.getElementById('page-title').innerText = "Virtual Office";
+            const appContent = document.getElementById('app-content');
+            appContent.innerHTML = `
+                <div class="fade-in flex flex-col h-full items-center justify-center text-center space-y-6">
+                    <div class="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mb-2">
+                        <i data-lucide="video" class="w-10 h-10 text-green-600"></i>
+                    </div>
+                    <h2 class="text-3xl font-bold text-slate-800">You are Offline</h2>
+                    <p class="text-slate-500 max-w-md">Start a session to allow students to join your queue for 1:1 doubts resolution.</p>
+                    <button onclick="showToast('Office Hours Started! Students notified.', 'info')" class="bg-[#fbbf24] text-slate-900 px-8 py-3 rounded-full font-bold text-lg shadow-lg hover:bg-amber-400 transition hover:scale-105 transform">
+                        Go Live Now
+                    </button>
+                    <div class="mt-8 pt-8 border-t border-slate-200 w-full max-w-lg">
+                        <h4 class="font-bold text-slate-700 mb-4 text-left">Upcoming Scheduled Sessions</h4>
+                        <div class="bg-white p-4 rounded-xl border border-slate-200 text-left flex justify-between items-center shadow-sm">
+                            <div>
+                                <p class="font-bold text-slate-800">Doubt Clearing: Dynamic Programming</p>
+                                <p class="text-sm text-slate-500">Tomorrow • 10:00 AM - 11:00 AM</p>
+                            </div>
+                            <button class="text-sm text-blue-600 font-bold">Edit</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            lucide.createIcons();
+        }
+
+        // --- INTERACTION HANDLERS ---
+
+        function nudgeStudent(id, name) {
+            const btn = document.getElementById(`nudge-${id}`);
+            btn.innerText = "Nudged ✓";
+            btn.classList.remove('bg-[#0f172a]', 'text-white');
+            btn.classList.add('bg-green-100', 'text-green-700', 'cursor-default');
+            btn.disabled = true;
+            showToast(`Notification sent to ${name}`);
+        }
+
+        function acceptDoubt(id) {
+            const item = document.getElementById(`queue-item-${id}`);
+            item.style.transform = 'translateX(20px)';
+            item.style.opacity = '0';
+            setTimeout(() => item.remove(), 300);
+            showToast("Student admitted to session");
+        }
+
+        function deferDoubt(id) {
+            const item = document.getElementById(`queue-item-${id}`);
+            item.style.opacity = '0.5';
+            setTimeout(() => item.remove(), 300);
+            showToast("Doubt deferred to next session", 'info');
+        }
+
+        function autoAssignTasks() {
+            showToast("Remedial tasks assigned to 12 students!", "success");
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            renderDashboard();
+        });
+
+    </script>
+</body>
+</html>
